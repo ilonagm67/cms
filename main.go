@@ -2,15 +2,23 @@ package main
 
 import (
 	"cms/internal/repository/memory"
+	"cms/internal/handler/telegram"
+	"cms/internal/route/tg"
 	"cms/internal/service"
 )
 
 func main() {
-	userrepo := memory.NewUserRepository()
 	orderrepo := memory.NewOrderRepository()
 	productrepo := memory.NewProductRepository()
+	userrepo := memory.NewUserRepository()
 
-	service.NewUserService(userrepo)
-	service.NewOrderService(orderrepo)
-	service.NewProductService(productrepo)
+	orderservice := service.NewOrderService(orderrepo)
+	productservice := service.NewProductService(productrepo)
+	userservice := service.NewUserService(userrepo)
+
+	orderhandler := telegram.NewOrderHandler(orderservice)
+	producthandler := telegram.NewProductHandler(productservice)
+	userhandler := telegram.NewUserHandler(userservice)
+
+	tg.NewRouter(orderhandler,producthandler,userhandler)
 }
