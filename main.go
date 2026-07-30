@@ -1,9 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"cms/internal/repository/memory"
+	"cms/internal/service"
 )
 
 func main() {
-	fmt.Println("hello cms")
+	userrepo := memory.NewUserRepository()
+	orderrepo := memory.NewOrderRepository()
+	productrepo := memory.NewProductRepository()
+
+	service.NewUserService(userrepo)
+	service.NewOrderService(orderrepo)
+	service.NewProductService(productrepo)
 }
