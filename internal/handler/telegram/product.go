@@ -2,12 +2,13 @@ package telegram
 
 import (
 	"cms/internal/service"
+	tele "gopkg.in/telebot.v4"
 )
 
 type ProductHandler struct {
-	ProductService *service.ProductService
+	Service *service.ProductService
 }
 
-func NewProductHandler(ProductService *service.ProductService) *ProductHandler {
-	return &ProductHandler{ProductService: ProductService}
+func NewProductHandler(Service *service.ProductService) *ProductHandler {
+	return &ProductHandler{Service: Service}
 }

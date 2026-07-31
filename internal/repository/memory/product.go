@@ -2,6 +2,7 @@ package memory
 
 import (
 	"cms/internal/entity"
+	"log"
 )
 
 type ProductRepository struct {
@@ -16,5 +17,6 @@ func NewProductRepository() *ProductRepository {
 
 func (repo *ProductRepository) Create(name string, product *entity.Product) error {
 	repo.products[name] = product
+	log.Println(repo.products)
 	return nil
 }
