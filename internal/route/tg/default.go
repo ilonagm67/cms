@@ -14,13 +14,6 @@ type Router struct {
 	Uh *telegram.UserHandler
 }
 
-var (
-	menu = &tele.ReplyMarkup{ResizeKeyboard: true}
-	btnCatalog = menu.Text("🛒Каталог")
-	btnQuestion = menu.Text("❓Вопрос")
-	btnNumber = menu.Text("📞Контакты")
-)
-
 func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *telegram.UserHandler) {
 	pref := tele.Settings{
 		Token:  os.Getenv("TOKEN"),
@@ -33,16 +26,7 @@ func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *teleg
 		return
 	}
 
-	menu.Reply(
-		menu.Row(btnCatalog),
-		menu.Row(btnOrder),
-		menu.Row(btnQuestion),
-		menu.Row(btnNumber),
-	)
-
-	b.Handle("/start",func (c tele.Context) error {
-		return c.Send("Добро пожаловать в наш магазин!",menu)
-	})
+	b.Handle("/start",Uh.Start)
 
 	b.Start()
 }

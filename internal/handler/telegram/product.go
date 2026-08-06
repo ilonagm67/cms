@@ -2,7 +2,6 @@ package telegram
 
 import (
 	"cms/internal/service"
-	tele "gopkg.in/telebot.v4"
 )
 
 type ProductHandler struct {
