@@ -2,7 +2,7 @@ package memory
 
 import (
 	"cms/internal/entity"
-	"fmt"
+	"errors"
 )
 
 type UserRepository struct {
@@ -17,6 +17,28 @@ func NewUserRepository() *UserRepository {
 
 func(repo *UserRepository) Add(ID int64,User *entity.User) error {
 	repo.users[ID] = User
-	fmt.Println(repo.users)
 	return nil
+}
+
+func(repo *UserRepository) Delete(ID int64) error {
+	_,ok := repo.users[ID]
+	if ok {
+		delete(repo.users,ID)
+		return nil
+	} else {
+		return errors.New("User Not Found")
+	}
+}
+
+func(repo *UserRepository) Get(ID int64) (*entity.User,error) {
+	i,ok := repo.users[ID]
+	if ok {
+		return i,nil
+	} else {
+		return nil,errors.New("User Not Found")
+	}
+}
+
+func(repo *UserRepository) List() (map[int64]*entity.User) {
+	return repo.users
 }
