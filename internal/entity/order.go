@@ -1,7 +1,7 @@
 package entity
 
 type Order struct {
-	ID       int64
+	ID       uint64
 	Customer User
 	Products []Product
 	PayType  string
