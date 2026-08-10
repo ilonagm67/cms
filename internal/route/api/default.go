@@ -12,9 +12,13 @@ type Router struct {
 }
 
 func NewRouter(Oh *web.OrderHandler, Ph *web.ProductHandler, Uh *web.UserHandler) {
-	http.HandleFunc("api/user/{id}", Uh.Get)
-	http.HandleFunc("api/users", Uh.List)
-	http.HandleFunc("api/products", Ph.List)
-	http.HandleFunc("api/orders", Oh.List)
+	http.HandleFunc("/api/user/{id}", Uh.Get)
+	http.HandleFunc("/api/users", Uh.List)
+
+	http.HandleFunc("/api/products", Ph.List)
+
+	http.HandleFunc("/api/order/{id}", Oh.Get)
+	http.HandleFunc("/api/orders", Oh.List)
+
 	http.ListenAndServe(":8080", nil)
 }

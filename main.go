@@ -1,8 +1,8 @@
 package main
 
 import (
-	"cms/internal/handler/web"
 	"cms/internal/handler/telegram"
+	"cms/internal/handler/web"
 	"cms/internal/repository/memory"
 	"cms/internal/route/api"
 	"cms/internal/route/tg"
@@ -25,8 +25,9 @@ func main() {
 	tgorderhandler := telegram.NewOrderHandler(orderservice)
 	tgproducthandler := telegram.NewProductHandler(productservice)
 	tguserhandler := telegram.NewUserHandler(userservice)
+	tgquestionhandler := telegram.NewQuestionHandler(userservice)
 
 	go api.NewRouter(apiorderhandler, apiproducthandler, apiuserhandler)
-	go tg.NewRouter(tgorderhandler, tgproducthandler, tguserhandler)
+	go tg.NewRouter(tgorderhandler, tgproducthandler, tguserhandler, tgquestionhandler)
 	select {}
 }
