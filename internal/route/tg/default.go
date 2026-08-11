@@ -10,13 +10,14 @@ import (
 )
 
 type Router struct {
-	Oh *telegram.OrderHandler
-	Ph *telegram.ProductHandler
-	Uh *telegram.UserHandler
-	Qh *telegram.QuestionHandler
+	Bot             *tele.Bot
+	OrderHandler    *telegram.OrderHandler
+	ProductHandler  *telegram.ProductHandler
+	UserHandler     *telegram.UserHandler
+	QuestionHandler *telegram.QuestionHandler
 }
 
-func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *telegram.UserHandler, Qh *telegram.QuestionHandler) {
+func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *telegram.UserHandler, Qh *telegram.QuestionHandler) *Router {
 	pref := tele.Settings{
 		Token:  os.Getenv("TOKEN"),
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
@@ -28,8 +29,12 @@ func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *teleg
 		return
 	}
 
-	b.Handle("/start", Uh.Start)
-	b.Handle("🛒Каталог", Ph.List)
+	return &Router{Bot: b, OrderHandler: Oh, ProductHandler: Ph, UserHandler: Uh, QuestionHandler: Qh}
+}
 
-	b.Start()
+func (r *Router) Init() {
+	r.Bot.Handle("/start", r.UserHandler.Start)
+	r.Bot.Handle("🛒Каталог", r.ProductHandler.List)
+
+	r.Bot.Start()
 }

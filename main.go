@@ -27,7 +27,10 @@ func main() {
 	tguserhandler := telegram.NewUserHandler(userservice)
 	tgquestionhandler := telegram.NewQuestionHandler(userservice)
 
-	go api.NewRouter(apiorderhandler, apiproducthandler, apiuserhandler)
-	go tg.NewRouter(tgorderhandler, tgproducthandler, tguserhandler, tgquestionhandler)
+	apiroute := api.NewRouter(apiorderhandler, apiproducthandler, apiuserhandler)
+	tgroute := tg.NewRouter(tgorderhandler, tgproducthandler, tguserhandler, tgquestionhandler)
+
+	go apiroute.Init()
+	go tgroute.Init()
 	select {}
 }
