@@ -1,6 +1,10 @@
 package telegram
 
-import "cms/internal/service"
+import (
+	"cms/internal/service"
+
+	tele "gopkg.in/telebot.v4"
+)
 
 type QuestionHandler struct {
 	UserService *service.UserService
@@ -8,4 +12,8 @@ type QuestionHandler struct {
 
 func NewQuestionHandler(UserService *service.UserService) *QuestionHandler {
 	return &QuestionHandler{UserService: UserService}
+}
+
+func (o *QuestionHandler) Start(c tele.Context) error {
+	return nil
 }

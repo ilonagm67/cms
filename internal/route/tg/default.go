@@ -26,7 +26,7 @@ func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *teleg
 	b, err := tele.NewBot(pref)
 	if err != nil {
 		log.Fatal(err)
-		return
+		return nil
 	}
 
 	return &Router{Bot: b, OrderHandler: Oh, ProductHandler: Ph, UserHandler: Uh, QuestionHandler: Qh}
@@ -35,6 +35,9 @@ func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *teleg
 func (r *Router) Init() {
 	r.Bot.Handle("/start", r.UserHandler.Start)
 	r.Bot.Handle("🛒Каталог", r.ProductHandler.List)
+	r.Bot.Handle("🛍Заказать товар", r.OrderHandler.Start)
+	r.Bot.Handle("❓Вопрос", r.QuestionHandler.Start)
+	r.Bot.Handle("📞Контакты", r.UserHandler.Contact)
 
 	r.Bot.Start()
 }

@@ -25,3 +25,7 @@ func (handler *UserHandler) Start(c tele.Context) error {
 	)
 	return c.Send("Добро пожаловать в наш магазин!", MainMenu)
 }
+
+func (o *UserHandler) Contact(c tele.Context) error {
+	return nil
+}

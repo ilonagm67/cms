@@ -1,4 +1,4 @@
-package api
+package http
 
 import (
 	"cms/internal/handler/web"
