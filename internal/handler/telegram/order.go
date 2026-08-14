@@ -8,12 +8,19 @@ import (
 
 type OrderHandler struct {
 	OrderService *service.OrderService
+	UserService  *service.UserService
 }
 
-func NewOrderHandler(OrderService *service.OrderService) *OrderHandler {
-	return &OrderHandler{OrderService: OrderService}
+func NewOrderHandler(Os *service.OrderService, Us *service.UserService) *OrderHandler {
+	return &OrderHandler{OrderService: Os, UserService: Us}
 }
 
 func (o *OrderHandler) Start(c tele.Context) error {
+	sender := c.Sender()
+	o.OrderService.Add(sender.ID, sender.FirstName)
+	return nil
+}
+
+func (o *OrderHandler) Hello() error {
 	return nil
 }

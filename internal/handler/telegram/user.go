@@ -16,7 +16,7 @@ func NewUserHandler(UserService *service.UserService) *UserHandler {
 
 func (handler *UserHandler) Start(c tele.Context) error {
 	user := c.Sender()
-	handler.UserService.Add(user.ID, user.FirstName)
+	handler.UserService.Add(user.ID, user.FirstName, "none")
 	MainMenu.Reply(
 		MainMenu.Row(BtnCatalog),
 		MainMenu.Row(BtnOrder),

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"cms/internal/entity"
 	"cms/internal/usecase"
 	"encoding/json"
 )
@@ -13,11 +14,11 @@ func NewOrderService(OrderRepo usecase.OrderRepository) *OrderService {
 	return &OrderService{OrderRepo: OrderRepo}
 }
 
-//func (Service *OrderService) Add() {
-//	Service.OrderRepo.Add(id,&entity.Order{ID:id,Name: name})
-//}
+func (Service *OrderService) Add(id int64, name string) {
+	Service.OrderRepo.Add(id, &entity.Order{ID: 1})
+}
 
-func (Service *OrderService) Get(id uint64) ([]byte, error) {
+func (Service *OrderService) Get(id int64) ([]byte, error) {
 	user, err := Service.OrderRepo.Get(id)
 	if err != nil {
 		return nil, err

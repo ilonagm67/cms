@@ -17,7 +17,7 @@ func NewOrderHandler(OrderService *service.OrderService) *OrderHandler {
 }
 
 func (handler *OrderHandler) Get(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
 		logging := fmt.Sprintf("IP: %s, Path: %s, Error: %s", r.RemoteAddr, r.RequestURI, err.Error())
 		log.Println(logging)

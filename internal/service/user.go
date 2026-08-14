@@ -1,8 +1,8 @@
 package service
 
 import (
-	"cms/internal/usecase"
 	"cms/internal/entity"
+	"cms/internal/usecase"
 	"encoding/json"
 )
 
@@ -14,8 +14,8 @@ func NewUserService(UserRepo usecase.UserRepository) *UserService {
 	return &UserService{UserRepo: UserRepo}
 }
 
-func (Service *UserService) Add(id int64,name string) {
-	Service.UserRepo.Add(id,&entity.User{ID:id,Name: name})
+func (Service *UserService) Add(id int64, name string, state entity.State) {
+	Service.UserRepo.Add(id, &entity.User{ID: id, Name: name, State: state})
 }
 
 func (Service *UserService) Delete(id int64) bool {
@@ -26,23 +26,23 @@ func (Service *UserService) Delete(id int64) bool {
 	return true
 }
 
-func (Service *UserService) Get(id int64) ([]byte,error) {
-	user,err := Service.UserRepo.Get(id)
+func (Service *UserService) Get(id int64) ([]byte, error) {
+	user, err := Service.UserRepo.Get(id)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	b,err := json.Marshal(user)
+	b, err := json.Marshal(user)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	return b,nil
+	return b, nil
 }
 
-func (Service *UserService) List() ([]byte,error) {
+func (Service *UserService) List() ([]byte, error) {
 	list := Service.UserRepo.List()
-	json,err := json.Marshal(list)
+	json, err := json.Marshal(list)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	return json,nil
+	return json, nil
 }

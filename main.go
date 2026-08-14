@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	memory.NewStateRepository()
 	orderrepo := memory.NewOrderRepository()
 	productrepo := memory.NewProductRepository()
 	userrepo := memory.NewUserRepository()
@@ -23,7 +22,7 @@ func main() {
 	webproducthandler := web.NewProductHandler(productservice)
 	webuserhandler := web.NewUserHandler(userservice)
 
-	tgorderhandler := telegram.NewOrderHandler(orderservice)
+	tgorderhandler := telegram.NewOrderHandler(orderservice, userservice)
 	tgproducthandler := telegram.NewProductHandler(productservice)
 	tguserhandler := telegram.NewUserHandler(userservice)
 	tgquestionhandler := telegram.NewQuestionHandler(userservice)
