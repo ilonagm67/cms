@@ -15,7 +15,7 @@ func NewProductService(ProductRepo usecase.ProductRepository) *ProductService {
 }
 
 func (service *ProductService) Add(name string, weight int) {
-	service.ProductRepo.Add(name, weight, &entity.Product{Name: name, Weight: weight})
+	service.ProductRepo.Add(&entity.Product{Name: name, Weight: weight})
 }
 
 func (Service *ProductService) Delete(name string) bool {

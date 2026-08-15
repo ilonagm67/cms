@@ -28,11 +28,11 @@ func (handler *ProductHandler) List(c tele.Context) error {
 		return c.Send("Произошла ошибка")
 	}
 
-	var p map[string]map[float64]*entity.Product
+	var p map[string]map[int]*entity.Product
 	json.Unmarshal(list, &p)
 
-	for range p {
-		err := c.Send("hello")
+	for key, _ := range p {
+		err := c.Send(key)
 		if err != nil {
 			return err
 		}

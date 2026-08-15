@@ -15,9 +15,12 @@ func NewProductRepository() *ProductRepository {
 	}
 }
 
-func (repo *ProductRepository) Add(Name string, Weight int, Product *entity.Product) error {
-	repo.products[Name] = make(map[int]*entity.Product)
-	repo.products[Name][Weight] = Product
+func (repo *ProductRepository) Add(Product *entity.Product) error {
+	_, exists := repo.products[Product.Name]
+	if !exists {
+		repo.products[Product.Name] = make(map[int]*entity.Product)
+	}
+	repo.products[Product.Name][Product.Weight] = Product
 	return nil
 }
 
