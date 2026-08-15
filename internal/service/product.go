@@ -1,8 +1,8 @@
 package service
 
 import (
-	"cms/internal/usecase"
 	"cms/internal/entity"
+	"cms/internal/usecase"
 	"encoding/json"
 )
 
@@ -14,8 +14,8 @@ func NewProductService(ProductRepo usecase.ProductRepository) *ProductService {
 	return &ProductService{ProductRepo: ProductRepo}
 }
 
-func(service *ProductService) Add(name string) {
-	service.ProductRepo.Add(name,&entity.Product{Name: name})
+func (service *ProductService) Add(name string, weight int) {
+	service.ProductRepo.Add(name, weight, &entity.Product{Name: name, Weight: weight})
 }
 
 func (Service *ProductService) Delete(name string) bool {
@@ -26,23 +26,23 @@ func (Service *ProductService) Delete(name string) bool {
 	return true
 }
 
-func (Service *ProductService) Get(name string) ([]byte,error) {
-	user,err := Service.ProductRepo.Get(name)
+func (Service *ProductService) Get(name string, weight int) ([]byte, error) {
+	user, err := Service.ProductRepo.Get(name, weight)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	b,err := json.Marshal(user)
+	b, err := json.Marshal(user)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	return b,nil
+	return b, nil
 }
 
-func (Service *ProductService) List() ([]byte,error) {
+func (Service *ProductService) List() ([]byte, error) {
 	list := Service.ProductRepo.List()
-	json,err := json.Marshal(list)
+	json, err := json.Marshal(list)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	return json,nil
+	return json, nil
 }

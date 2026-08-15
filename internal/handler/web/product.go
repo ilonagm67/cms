@@ -16,6 +16,7 @@ func NewProductHandler(ProductService *service.ProductService) *ProductHandler {
 }
 
 func (handler *ProductHandler) List(w http.ResponseWriter, r *http.Request) {
+	handler.ProductService.Add("test", 50)
 	list, err := handler.ProductService.List()
 	if err != nil {
 		logging := fmt.Sprintf("IP: %s, Path: %s, Error: %s", r.RemoteAddr, r.RequestURI, err.Error())
