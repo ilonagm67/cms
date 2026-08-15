@@ -1,33 +1,40 @@
-package memory
+package sqlite
 
 import (
 	"cms/internal/entity"
-	"errors"
+	"database/sql"
+	"log"
+
+	_ "modernc.org/sqlite"
 )
 
 type OrderRepository struct {
-	orders map[int64]*entity.Order
+	DB *sql.DB
 }
 
 func NewOrderRepository() *OrderRepository {
-	return &OrderRepository{
-		orders: make(map[int64]*entity.Order, 0),
+	db, err := sql.Open("sqlite", "./order.db")
+	if err != nil {
+		log.Fatal(err)
+		return nil
 	}
+	defer db.Close()
+	sql := `CREATE TABLE orders (
+		id INTEGER PRIMARY KEY,
+	);`
+
+	db.Exec(sql)
+	return &OrderRepository{DB: db}
 }
 
 func (repo *OrderRepository) Add(ID int64, Order *entity.Order) error {
-	repo.orders[ID] = Order
 	return nil
 }
 
 func (repo *OrderRepository) Get(ID int64) (*entity.Order, error) {
-	order, ok := repo.orders[ID]
-	if ok {
-		return order, nil
-	}
-	return nil, errors.New("Order Not Found")
+	return nil, nil
 }
 
 func (repo *OrderRepository) List() map[int64]*entity.Order {
-	return repo.orders
+	return nil
 }

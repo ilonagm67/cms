@@ -15,7 +15,7 @@ func NewOrderService(OrderRepo usecase.OrderRepository) *OrderService {
 }
 
 func (Service *OrderService) Add(id int64, name string) {
-	Service.OrderRepo.Add(id, &entity.Order{ID: 1})
+	Service.OrderRepo.Add(id, &entity.Order{Customer: entity.User{ID: id, Name: name}})
 }
 
 func (Service *OrderService) Get(id int64) ([]byte, error) {
