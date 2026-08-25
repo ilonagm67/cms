@@ -15,12 +15,12 @@ func NewOrderHandler(Os *service.OrderService, Us *service.UserService) *OrderHa
 	return &OrderHandler{OrderService: Os, UserService: Us}
 }
 
-func (o *OrderHandler) Start(c tele.Context) error {
-	sender := c.Sender()
-	o.OrderService.Add(sender.ID, sender.FirstName)
-	return nil
+func (handler *OrderHandler) Start(c tele.Context) error {
+	user := c.Sender()
+	handler.OrderService.Add(user.ID, user.FirstName)
+	return c.Send("Enter name: ")
 }
 
-func (o *OrderHandler) Hello() error {
+func (handler *OrderHandler) Hello() error {
 	return nil
 }

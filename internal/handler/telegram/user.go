@@ -16,7 +16,7 @@ func NewUserHandler(UserService *service.UserService) *UserHandler {
 
 func (handler *UserHandler) Start(c tele.Context) error {
 	user := c.Sender()
-	handler.UserService.Add(user.ID, user.FirstName, "none")
+	handler.UserService.Add(user.ID, user.FirstName)
 	MainMenu.Reply(
 		MainMenu.Row(BtnCatalog),
 		MainMenu.Row(BtnOrder),
@@ -26,6 +26,6 @@ func (handler *UserHandler) Start(c tele.Context) error {
 	return c.Send("Добро пожаловать в наш магазин!", MainMenu)
 }
 
-func (o *UserHandler) Contact(c tele.Context) error {
+func (handler *UserHandler) Contact(c tele.Context) error {
 	return nil
 }

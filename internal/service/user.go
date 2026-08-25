@@ -14,8 +14,8 @@ func NewUserService(UserRepo usecase.UserRepository) *UserService {
 	return &UserService{UserRepo: UserRepo}
 }
 
-func (Service *UserService) Add(id int64, name string, state entity.State) {
-	Service.UserRepo.Add(id, &entity.User{ID: id, Name: name, State: state})
+func (Service *UserService) Add(id int64, name string) {
+	Service.UserRepo.Add(id, &entity.User{ID: id, Name: name})
 }
 
 func (Service *UserService) Delete(id int64) bool {

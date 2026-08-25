@@ -14,6 +14,6 @@ func NewQuestionHandler(UserService *service.UserService) *QuestionHandler {
 	return &QuestionHandler{UserService: UserService}
 }
 
-func (o *QuestionHandler) Start(c tele.Context) error {
+func (handler *QuestionHandler) Start(c tele.Context) error {
 	return nil
 }
