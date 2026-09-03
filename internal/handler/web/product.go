@@ -20,8 +20,14 @@ func (handler *ProductHandler) List(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logging := fmt.Sprintf("IP: %s, Path: %s, Error: %s", r.RemoteAddr, r.RequestURI, err.Error())
 		log.Println(logging)
-		fmt.Fprintf(w, "Error")
+		_, err := fmt.Fprintf(w, "Error")
+		if err != nil {
+			log.Println(err)
+		}
 	}
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(w, "%s", list)
+	_, err = fmt.Fprintf(w, "%s", list)
+	if err != nil {
+		log.Println(err)
+	}
 }

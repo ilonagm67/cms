@@ -29,7 +29,12 @@ func (handler *ProductHandler) List(c tele.Context) error {
 	}
 
 	var p map[string]map[int]*entity.Product
-	json.Unmarshal(list, &p)
+	err = json.Unmarshal(list, &p)
+	if err != nil {
+		logging := fmt.Sprintf("ID: %v, Error: %s", user.ID, err.Error())
+		log.Println(logging)
+		return c.Send("Произошла ошибка")
+	}
 
 	for key, _ := range p {
 		err := c.Send(key)

@@ -3,12 +3,11 @@ package entity
 type State string
 
 const (
-	StateNone        State = "none"
-	StateWaitingName State = "name"
+	StateNone State = "none"
 )
 
 type User struct {
-	ID     int64
+	UserID int64
 	Name   string
 	State  State
 	Number string

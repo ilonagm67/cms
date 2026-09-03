@@ -19,11 +19,19 @@ func NewOrderRepository() *OrderRepository {
 		return nil
 	}
 	defer db.Close()
-	sql := `CREATE TABLE orders (
-		id INTEGER PRIMARY KEY,
+	sqlOrders := `CREATE TABLE IF NOT EXISTS orders (
+		OrderID INTEGER,
+		CustomerID INTEGER,
+		PayType VARCHAR(255),
+		Address VARCHAR(255),
+		Delivery VARCHAR(255)
 	);`
 
-	db.Exec(sql)
+	_, err = db.Exec(sqlOrders)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
 	return &OrderRepository{DB: db}
 }
 
@@ -35,6 +43,6 @@ func (repo *OrderRepository) Get(ID int64) (*entity.Order, error) {
 	return nil, nil
 }
 
-func (repo *OrderRepository) List() map[int64]*entity.Order {
+func (repo *OrderRepository) List() map[int64]map[uint64]*entity.Order {
 	return nil
 }

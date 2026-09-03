@@ -16,8 +16,6 @@ func NewOrderHandler(Os *service.OrderService, Us *service.UserService) *OrderHa
 }
 
 func (handler *OrderHandler) Start(c tele.Context) error {
-	user := c.Sender()
-	handler.OrderService.Add(user.ID, user.FirstName)
 	return c.Send("Enter name: ")
 }
 

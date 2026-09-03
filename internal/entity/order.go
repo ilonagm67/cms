@@ -2,7 +2,7 @@ package entity
 
 type Order struct {
 	ID       int64
-	Customer User
+	UserID   int64
 	Products []Product
 	PayType  string
 	Address  string

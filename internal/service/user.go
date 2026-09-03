@@ -14,16 +14,20 @@ func NewUserService(UserRepo usecase.UserRepository) *UserService {
 	return &UserService{UserRepo: UserRepo}
 }
 
-func (Service *UserService) Add(id int64, name string) {
-	Service.UserRepo.Add(id, &entity.User{ID: id, Name: name})
+func (Service *UserService) Add(id int64, name string) error {
+	err := Service.UserRepo.Add(id, &entity.User{UserID: id, Name: name})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (Service *UserService) Delete(id int64) bool {
+func (Service *UserService) Delete(id int64) error {
 	err := Service.UserRepo.Delete(id)
 	if err != nil {
-		return false
+		return err
 	}
-	return true
+	return nil
 }
 
 func (Service *UserService) Get(id int64) ([]byte, error) {

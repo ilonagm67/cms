@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"cms/internal/service"
+	"fmt"
 
 	tele "gopkg.in/telebot.v4"
 )
@@ -16,7 +17,11 @@ func NewUserHandler(UserService *service.UserService) *UserHandler {
 
 func (handler *UserHandler) Start(c tele.Context) error {
 	user := c.Sender()
-	handler.UserService.Add(user.ID, user.FirstName)
+	err := handler.UserService.Add(user.ID, user.FirstName)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 	MainMenu.Reply(
 		MainMenu.Row(BtnCatalog),
 		MainMenu.Row(BtnOrder),

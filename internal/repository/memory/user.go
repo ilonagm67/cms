@@ -15,30 +15,36 @@ func NewUserRepository() *UserRepository {
 	}
 }
 
-func(repo *UserRepository) Add(ID int64,User *entity.User) error {
+func (repo *UserRepository) Add(ID int64, User *entity.User) error {
 	repo.users[ID] = User
+	repo.users[ID].State = "none"
 	return nil
 }
 
-func(repo *UserRepository) Delete(ID int64) error {
-	_,ok := repo.users[ID]
+func (repo *UserRepository) SetState(ID int64, state entity.State) error {
+	repo.users[ID].State = state
+	return nil
+}
+
+func (repo *UserRepository) Delete(ID int64) error {
+	_, ok := repo.users[ID]
 	if ok {
-		delete(repo.users,ID)
+		delete(repo.users, ID)
 		return nil
 	} else {
 		return errors.New("User Not Found")
 	}
 }
 
-func(repo *UserRepository) Get(ID int64) (*entity.User,error) {
-	i,ok := repo.users[ID]
+func (repo *UserRepository) Get(ID int64) (*entity.User, error) {
+	i, ok := repo.users[ID]
 	if ok {
-		return i,nil
+		return i, nil
 	} else {
-		return nil,errors.New("User Not Found")
+		return nil, errors.New("User Not Found")
 	}
 }
 
-func(repo *UserRepository) List() (map[int64]*entity.User) {
+func (repo *UserRepository) List() map[int64]*entity.User {
 	return repo.users
 }
