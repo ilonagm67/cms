@@ -18,6 +18,11 @@ type Router struct {
 }
 
 func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *telegram.UserHandler, Qh *telegram.QuestionHandler) *Router {
+	token := os.Getenv("TOKEN")
+	if token == "" {
+		log.Fatal("env TOKEN not found")
+	}
+
 	pref := tele.Settings{
 		Token:  os.Getenv("TOKEN"),
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
