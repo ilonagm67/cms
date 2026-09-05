@@ -25,7 +25,3 @@ func (handler *OrderHandler) Middleware(next tele.HandlerFunc) tele.HandlerFunc 
 func (handler *OrderHandler) Start(c tele.Context) error {
 	return c.Send("Enter name: ")
 }
-
-func (handler *OrderHandler) Processing(c tele.Context) error {
-
-}

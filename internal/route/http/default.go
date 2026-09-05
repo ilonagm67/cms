@@ -5,6 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Router struct {
@@ -20,6 +23,13 @@ func NewRouter(Oh *web.OrderHandler, Ph *web.ProductHandler, Uh *web.UserHandler
 }
 
 func (r *Router) Init() {
+
+	reg := prometheus.NewRegistry()
+	reg.MustRegister(
+		collectors.NewGoCollector(),
+		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
+	)
+
 	r.Router.HandleFunc("/api/user/{id}", r.UserHandler.Get)
 	r.Router.HandleFunc("/api/users", r.UserHandler.List)
 
@@ -29,6 +39,7 @@ func (r *Router) Init() {
 	r.Router.HandleFunc("/api/orders", r.OrderHandler.List)
 
 	r.Router.HandleFunc("/health", r.UserHandler.Health)
+	r.Router.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
 
 	http.Handle("/", r.Router)
 	http.ListenAndServe(":8080", nil)
