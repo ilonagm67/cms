@@ -24,7 +24,7 @@ func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *teleg
 	}
 
 	pref := tele.Settings{
-		Token:  os.Getenv("TOKEN"),
+		Token:  token,
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 	}
 
@@ -38,11 +38,21 @@ func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *teleg
 }
 
 func (r *Router) Init() {
-	r.Bot.Handle("/start", r.UserHandler.Start)
-	r.Bot.Handle("🛒Каталог", r.ProductHandler.List)
-	r.Bot.Handle("🛍Заказать товар", r.OrderHandler.Start)
-	r.Bot.Handle("❓Вопрос", r.QuestionHandler.Start)
-	r.Bot.Handle("📞Контакты", r.UserHandler.Contact)
+	OrderGroup := r.Bot.Group()
+	ProductGroup := r.Bot.Group()
+	UserGroup := r.Bot.Group()
+	QuestionGroup := r.Bot.Group()
+
+	OrderGroup.Use(r.OrderHandler.Middleware)
+	ProductGroup.Use(r.ProductHandler.Middleware)
+	UserGroup.Use(r.UserHandler.Middleware)
+	QuestionGroup.Use(r.QuestionHandler.Middleware)
+
+	UserGroup.Handle("/start", r.UserHandler.Start)
+	ProductGroup.Handle("🛒Каталог", r.ProductHandler.List)
+	OrderGroup.Handle("🛍Заказать товар", r.OrderHandler.Start)
+	QuestionGroup.Handle("❓Вопрос", r.QuestionHandler.Start)
+	UserGroup.Handle("📞Контакты", r.UserHandler.Contact)
 
 	r.Bot.Start()
 }

@@ -15,6 +15,13 @@ func NewUserHandler(UserService *service.UserService) *UserHandler {
 	return &UserHandler{UserService: UserService}
 }
 
+func (handler *UserHandler) Middleware(next tele.HandlerFunc) tele.HandlerFunc {
+	return func(c tele.Context) error {
+		err := next(c)
+		return err
+	}
+}
+
 func (handler *UserHandler) Start(c tele.Context) error {
 	user := c.Sender()
 	err := handler.UserService.Add(user.ID, user.FirstName)

@@ -28,6 +28,8 @@ func (r *Router) Init() {
 	r.Router.HandleFunc("/api/order/{id}", r.OrderHandler.Get)
 	r.Router.HandleFunc("/api/orders", r.OrderHandler.List)
 
+	r.Router.HandleFunc("/health", r.UserHandler.Health)
+
 	http.Handle("/", r.Router)
 	http.ListenAndServe(":8080", nil)
 }

@@ -15,10 +15,17 @@ func NewOrderHandler(Os *service.OrderService, Us *service.UserService) *OrderHa
 	return &OrderHandler{OrderService: Os, UserService: Us}
 }
 
+func (handler *OrderHandler) Middleware(next tele.HandlerFunc) tele.HandlerFunc {
+	return func(c tele.Context) error {
+		err := next(c)
+		return err
+	}
+}
+
 func (handler *OrderHandler) Start(c tele.Context) error {
 	return c.Send("Enter name: ")
 }
 
-func (handler *OrderHandler) Hello() error {
-	return nil
+func (handler *OrderHandler) Processing(c tele.Context) error {
+
 }

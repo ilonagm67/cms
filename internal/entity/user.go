@@ -3,7 +3,9 @@ package entity
 type State string
 
 const (
-	StateNone State = "none"
+	StateNone           State = "none"
+	StateAwaitingName   State = "name"
+	StateAwaitingNumber State = "number"
 )
 
 type User struct {

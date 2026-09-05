@@ -50,3 +50,12 @@ func (Service *UserService) List() ([]byte, error) {
 	}
 	return json, nil
 }
+
+func (Service *UserService) Health() ([]byte, error) {
+	message := "Healthy"
+	json, err := json.Marshal(message)
+	if err != nil {
+		return nil, err
+	}
+	return json, nil
+}

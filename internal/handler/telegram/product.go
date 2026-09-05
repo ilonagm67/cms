@@ -18,6 +18,13 @@ func NewProductHandler(ProductService *service.ProductService) *ProductHandler {
 	return &ProductHandler{ProductService: ProductService}
 }
 
+func (handler *ProductHandler) Middleware(next tele.HandlerFunc) tele.HandlerFunc {
+	return func(c tele.Context) error {
+		err := next(c)
+		return err
+	}
+}
+
 func (handler *ProductHandler) List(c tele.Context) error {
 	user := c.Sender()
 	list, err := handler.ProductService.List()

@@ -26,6 +26,10 @@ func (repo *UserRepository) SetState(ID int64, state entity.State) error {
 	return nil
 }
 
+func (repo *UserRepository) GetState(ID int64) (entity.State, error) {
+	return repo.users[ID].State, nil
+}
+
 func (repo *UserRepository) Delete(ID int64) error {
 	_, ok := repo.users[ID]
 	if ok {
