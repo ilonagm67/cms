@@ -12,6 +12,7 @@ import (
 
 type Router struct {
 	Router         *mux.Router
+	Metrics        *prometheus.Registry
 	OrderHandler   *web.OrderHandler
 	ProductHandler *web.ProductHandler
 	UserHandler    *web.UserHandler
@@ -19,17 +20,15 @@ type Router struct {
 
 func NewRouter(Oh *web.OrderHandler, Ph *web.ProductHandler, Uh *web.UserHandler) *Router {
 	r := mux.NewRouter()
-	return &Router{Router: r, OrderHandler: Oh, ProductHandler: Ph, UserHandler: Uh}
-}
-
-func (r *Router) Init() {
-
 	reg := prometheus.NewRegistry()
 	reg.MustRegister(
 		collectors.NewGoCollector(),
 		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
 	)
+	return &Router{Router: r, Metrics: reg, OrderHandler: Oh, ProductHandler: Ph, UserHandler: Uh}
+}
 
+func (r *Router) Init() {
 	r.Router.HandleFunc("/api/user/{id}", r.UserHandler.Get)
 	r.Router.HandleFunc("/api/users", r.UserHandler.List)
 
@@ -39,7 +38,7 @@ func (r *Router) Init() {
 	r.Router.HandleFunc("/api/orders", r.OrderHandler.List)
 
 	r.Router.HandleFunc("/health", r.UserHandler.Health)
-	r.Router.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
+	r.Router.Handle("/metrics", promhttp.HandlerFor(r.Metrics, promhttp.HandlerOpts{}))
 
 	http.Handle("/", r.Router)
 	http.ListenAndServe(":8080", nil)

@@ -69,6 +69,7 @@ func (handler *UserHandler) Health(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 		}
 	}
+	w.Header().Set("Content-Type", "application/json")
 	_, err = fmt.Fprintf(w, "%s", message)
 	if err != nil {
 		log.Println(err)
