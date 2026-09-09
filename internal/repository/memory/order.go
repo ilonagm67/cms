@@ -41,6 +41,6 @@ func (repo *OrderRepository) Get(ID int64) (*entity.Order, error) {
 	return nil, errors.New("Order Not Found")
 }
 
-func (repo *OrderRepository) List() map[int64]map[uint64]*entity.Order {
-	return repo.orders
+func (repo *OrderRepository) List() (map[int64]map[uint64]*entity.Order, error) {
+	return repo.orders, nil
 }

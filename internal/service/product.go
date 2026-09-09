@@ -43,7 +43,10 @@ func (Service *ProductService) Get(name string, weight int) ([]byte, error) {
 }
 
 func (Service *ProductService) List() ([]byte, error) {
-	list := Service.ProductRepo.List()
+	list, err := Service.ProductRepo.List()
+	if err != nil {
+		return nil, err
+	}
 	json, err := json.Marshal(list)
 	if err != nil {
 		return nil, err

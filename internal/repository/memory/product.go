@@ -43,6 +43,6 @@ func (repo *ProductRepository) Get(Name string, Weight int) (*entity.Product, er
 	}
 }
 
-func (repo *ProductRepository) List() map[string]map[int]*entity.Product {
-	return repo.products
+func (repo *ProductRepository) List() (map[string]map[int]*entity.Product, error) {
+	return repo.products, nil
 }

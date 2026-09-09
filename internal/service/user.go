@@ -43,7 +43,10 @@ func (Service *UserService) Get(id int64) ([]byte, error) {
 }
 
 func (Service *UserService) List() ([]byte, error) {
-	list := Service.UserRepo.List()
+	list, err := Service.UserRepo.List()
+	if err != nil {
+		return nil, err
+	}
 	json, err := json.Marshal(list)
 	if err != nil {
 		return nil, err

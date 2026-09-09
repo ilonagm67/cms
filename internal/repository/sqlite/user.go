@@ -46,6 +46,6 @@ func (repo *UserRepository) Get(ID int64) (*entity.User, error) {
 	return nil, nil
 }
 
-func (repo *UserRepository) List() map[int64]*entity.User {
-	return nil
+func (repo *UserRepository) List() (map[int64]*entity.User, error) {
+	return nil, nil
 }

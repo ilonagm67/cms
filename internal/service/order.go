@@ -35,7 +35,10 @@ func (Service *OrderService) Get(id int64) ([]byte, error) {
 }
 
 func (Service *OrderService) List() ([]byte, error) {
-	list := Service.OrderRepo.List()
+	list, err := Service.OrderRepo.List()
+	if err != nil {
+		return nil, err
+	}
 	json, err := json.Marshal(list)
 	if err != nil {
 		return nil, err

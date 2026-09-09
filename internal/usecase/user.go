@@ -8,5 +8,5 @@ type UserRepository interface {
 	GetState(ID int64) (entity.State, error)
 	Delete(ID int64) error
 	Get(ID int64) (*entity.User, error)
-	List() map[int64]*entity.User
+	List() (map[int64]*entity.User, error)
 }
