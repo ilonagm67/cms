@@ -29,24 +29,21 @@ func (repo *ProductRepository) Delete(Name string) error {
 	if ok {
 		delete(repo.products, Name)
 		return nil
-	} else {
-		return errors.New("Product Not Found")
 	}
+	return errors.New("Product Not Found")
 }
 
 func (repo *ProductRepository) Get(Name string, Weight int) (*entity.Product, error) {
 	i, ok := repo.products[Name][Weight]
 	if ok {
 		return i, nil
-	} else {
-		return nil, errors.New("Product Not Found")
 	}
+	return nil, errors.New("Product Not Found")
 }
 
 func (repo *ProductRepository) List() (map[string]map[int]*entity.Product, error) {
 	if len(repo.products) > 0 {
 		return repo.products, nil
-	} else {
-		return nil, errors.New("No Items in Database")
 	}
+	return nil, errors.New("No Items in Database")
 }

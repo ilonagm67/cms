@@ -17,17 +17,7 @@ func NewUserRepository() *UserRepository {
 
 func (repo *UserRepository) Add(ID int64, User *entity.User) error {
 	repo.users[ID] = User
-	repo.users[ID].State = "none"
 	return nil
-}
-
-func (repo *UserRepository) SetState(ID int64, state entity.State) error {
-	repo.users[ID].State = state
-	return nil
-}
-
-func (repo *UserRepository) GetState(ID int64) (entity.State, error) {
-	return repo.users[ID].State, nil
 }
 
 func (repo *UserRepository) Delete(ID int64) error {
@@ -35,24 +25,21 @@ func (repo *UserRepository) Delete(ID int64) error {
 	if ok {
 		delete(repo.users, ID)
 		return nil
-	} else {
-		return errors.New("User Not Found")
 	}
+	return errors.New("User Not Found")
 }
 
 func (repo *UserRepository) Get(ID int64) (*entity.User, error) {
-	i, ok := repo.users[ID]
+	user, ok := repo.users[ID]
 	if ok {
-		return i, nil
-	} else {
-		return nil, errors.New("User Not Found")
+		return user, nil
 	}
+	return nil, errors.New("User Not Found")
 }
 
 func (repo *UserRepository) List() (map[int64]*entity.User, error) {
 	if len(repo.users) > 0 {
 		return repo.users, nil
-	} else {
-		return nil, errors.New("No Items in Database")
 	}
+	return nil, errors.New("No Items in Database")
 }

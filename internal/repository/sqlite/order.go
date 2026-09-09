@@ -43,6 +43,6 @@ func (repo *OrderRepository) Get(ID int64) (*entity.Order, error) {
 	return nil, nil
 }
 
-func (repo *OrderRepository) List() (map[int64]map[uint64]*entity.Order, error) {
+func (repo *OrderRepository) List() (map[int64]*entity.Order, error) {
 	return nil, nil
 }
