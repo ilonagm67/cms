@@ -43,10 +43,6 @@ func (handler *OrderHandler) Get(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Println(err)
 			}
-			_, err = fmt.Fprintf(w, "Error")
-			if err != nil {
-				log.Println(err)
-			}
 		}
 	}
 }
@@ -60,10 +56,11 @@ func (handler *OrderHandler) List(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 		}
-	}
-	w.Header().Set("Content-Type", "application/json")
-	_, err = fmt.Fprintf(w, "%s", list)
-	if err != nil {
-		log.Println(err)
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		_, err = fmt.Fprintf(w, "%s", list)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }

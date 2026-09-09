@@ -24,10 +24,11 @@ func (handler *ProductHandler) List(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 		}
-	}
-	w.Header().Set("Content-Type", "application/json")
-	_, err = fmt.Fprintf(w, "%s", list)
-	if err != nil {
-		log.Println(err)
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		_, err = fmt.Fprintf(w, "%s", list)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }

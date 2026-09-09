@@ -25,20 +25,22 @@ func (handler *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 		}
-	}
-	user, err := handler.UserService.Get(id)
-	if err != nil {
-		logging := fmt.Sprintf("IP: %s, Path: %s, Error: %s", r.RemoteAddr, r.RequestURI, err.Error())
-		log.Println(logging)
-		_, err = fmt.Fprintf(w, "Error")
+	} else {
+		user, err := handler.UserService.Get(id)
 		if err != nil {
-			log.Println(err)
+			logging := fmt.Sprintf("IP: %s, Path: %s, Error: %s", r.RemoteAddr, r.RequestURI, err.Error())
+			log.Println(logging)
+			_, err = fmt.Fprintf(w, "Error")
+			if err != nil {
+				log.Println(err)
+			}
+		} else {
+			w.Header().Set("Content-Type", "application/json")
+			_, err = fmt.Fprintf(w, "%s", user)
+			if err != nil {
+				log.Println(err)
+			}
 		}
-	}
-	w.Header().Set("Content-Type", "application/json")
-	_, err = fmt.Fprintf(w, "%s", user)
-	if err != nil {
-		log.Println(err)
 	}
 }
 
@@ -51,11 +53,12 @@ func (handler *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 		}
-	}
-	w.Header().Set("Content-Type", "application/json")
-	_, err = fmt.Fprintf(w, "%s", list)
-	if err != nil {
-		log.Println(err)
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		_, err = fmt.Fprintf(w, "%s", list)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }
 
@@ -68,10 +71,11 @@ func (handler *UserHandler) Health(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 		}
-	}
-	w.Header().Set("Content-Type", "application/json")
-	_, err = fmt.Fprintf(w, "%s", message)
-	if err != nil {
-		log.Println(err)
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		_, err = fmt.Fprintf(w, "%s", message)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }

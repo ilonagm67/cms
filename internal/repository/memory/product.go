@@ -44,5 +44,9 @@ func (repo *ProductRepository) Get(Name string, Weight int) (*entity.Product, er
 }
 
 func (repo *ProductRepository) List() (map[string]map[int]*entity.Product, error) {
-	return repo.products, nil
+	if len(repo.products) > 0 {
+		return repo.products, nil
+	} else {
+		return nil, errors.New("No Items in Database")
+	}
 }

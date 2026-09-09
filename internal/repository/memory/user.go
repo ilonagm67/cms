@@ -50,5 +50,9 @@ func (repo *UserRepository) Get(ID int64) (*entity.User, error) {
 }
 
 func (repo *UserRepository) List() (map[int64]*entity.User, error) {
-	return repo.users, nil
+	if len(repo.users) > 0 {
+		return repo.users, nil
+	} else {
+		return nil, errors.New("No Items in Database")
+	}
 }

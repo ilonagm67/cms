@@ -42,5 +42,9 @@ func (repo *OrderRepository) Get(ID int64) (*entity.Order, error) {
 }
 
 func (repo *OrderRepository) List() (map[int64]map[uint64]*entity.Order, error) {
-	return repo.orders, nil
+	if len(repo.orders) > 0 {
+		return repo.orders, nil
+	} else {
+		return nil, errors.New("No Items in Database")
+	}
 }
