@@ -2,11 +2,15 @@ package tg
 
 import (
 	"cms/internal/handler/telegram"
+	"context"
 	"log"
 	"os"
+
+	"github.com/mymmrac/telego"
 )
 
 type Router struct {
+	Bot             *telego.Bot
 	OrderHandler    *telegram.OrderHandler
 	ProductHandler  *telegram.ProductHandler
 	UserHandler     *telegram.UserHandler
@@ -19,7 +23,18 @@ func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *teleg
 		log.Fatal("env TOKEN not found")
 	}
 
-	return &Router{OrderHandler: Oh, ProductHandler: Ph, UserHandler: Uh, QuestionHandler: Qh}
+	bot, err := telego.NewBot(token, telego.WithDefaultDebugLogger())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &Router{Bot: bot, OrderHandler: Oh, ProductHandler: Ph, UserHandler: Uh, QuestionHandler: Qh}
 }
 
-func (r *Router) Init() {}
+func (r *Router) Init() {
+	updates, _ := r.Bot.UpdatesViaLongPolling(context.Background(), nil)
+
+	for update := range updates {
+		log.Println(update)
+	}
+}
