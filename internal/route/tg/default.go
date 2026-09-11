@@ -41,5 +41,6 @@ func (r *Router) Init() {
 
 func (r *Router) RegisterHandlers(bh *th.BotHandler) {
 	bh.Handle(r.UserHandler.HandleStart, th.CommandEqual("start"))
-	bh.Handle(r.UserHandler.HandleName, r.UserHandler.StatePredicate("name"))
+	bh.Handle(r.UserHandler.HandleName, r.UserHandler.StatePredicate("user_name"))
+	bh.Handle(r.UserHandler.HandlePhone, r.UserHandler.StatePredicate("user_phone"))
 }

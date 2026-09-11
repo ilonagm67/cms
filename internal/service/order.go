@@ -1,7 +1,6 @@
 package service
 
 import (
-	"cms/internal/entity"
 	"cms/internal/usecase"
 	"encoding/json"
 )
@@ -12,14 +11,6 @@ type OrderService struct {
 
 func NewOrderService(OrderRepo usecase.OrderRepository) *OrderService {
 	return &OrderService{OrderRepo: OrderRepo}
-}
-
-func (Service *OrderService) Add(id int64, name string) error {
-	err := Service.OrderRepo.Add(id, &entity.Order{UserID: id})
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (Service *OrderService) Get(id int64) ([]byte, error) {

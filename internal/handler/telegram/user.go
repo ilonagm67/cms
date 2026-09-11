@@ -11,12 +11,11 @@ import (
 )
 
 type UserHandler struct {
-	UserService *service.UserService
-	FSMService  *service.FSMService
+	FSMService *service.FSMService
 }
 
-func NewUserHandler(UserService *service.UserService, FSMService *service.FSMService) *UserHandler {
-	return &UserHandler{UserService: UserService, FSMService: FSMService}
+func NewUserHandler(FSMService *service.FSMService) *UserHandler {
+	return &UserHandler{FSMService: FSMService}
 }
 
 func (handler *UserHandler) StatePredicate(targetState string) th.Predicate {
@@ -34,19 +33,36 @@ func (handler *UserHandler) StatePredicate(targetState string) th.Predicate {
 }
 
 func (handler *UserHandler) HandleStart(ctx *th.Context, update telego.Update) error {
-	handler.UserService.Start(update.Message.Chat.ID)
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Enter Your name: "),
+		fmt.Sprintf("Добро пожаловать в наш магазин!"),
+	))
+	handler.FSMService.UserStart(update.Message.Chat.ID)
+	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+		tu.ID(update.Message.Chat.ID),
+		fmt.Sprintf("Для регистрации введите ваше имя:"),
 	))
 	return nil
 }
 
 func (handler *UserHandler) HandleName(ctx *th.Context, update telego.Update) error {
-	handler.UserService.ProcessName(update.Message.Chat.ID, update.Message.Text)
+	handler.FSMService.UserProcessName(update.Message.Chat.ID, update.Message.Text)
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Hello %s!", update.Message.Text),
+		fmt.Sprintf("Введите Ваш Телефон: "),
+	).WithReplyMarkup(NumberKeyboard).WithProtectContent())
+	return nil
+}
+
+func (handler *UserHandler) HandlePhone(ctx *th.Context, update telego.Update) error {
+	handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Text)
+	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+		tu.ID(update.Message.Chat.ID),
+		fmt.Sprintf("Вы успешно зарегистрировались!"),
 	))
+	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+		tu.ID(update.Message.Chat.ID),
+		fmt.Sprintf("Выберите вариант из списка:"),
+	).WithReplyMarkup(MainKeyboard).WithProtectContent())
 	return nil
 }

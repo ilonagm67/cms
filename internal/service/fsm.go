@@ -1,13 +1,18 @@
 package service
 
-import "cms/internal/usecase"
+import (
+	"cms/internal/usecase"
+)
 
 type FSMService struct {
-	FSMRepo usecase.FSMRepository
+	OrderRepo   usecase.OrderRepository
+	ProductRepo usecase.ProductRepository
+	UserRepo    usecase.UserRepository
+	FSMRepo     usecase.FSMRepository
 }
 
-func NewFSMService(FSMRepo usecase.FSMRepository) *FSMService {
-	return &FSMService{FSMRepo: FSMRepo}
+func NewFSMService(FSMRepo usecase.FSMRepository, OrderRepo usecase.OrderRepository, ProductRepo usecase.ProductRepository, UserRepo usecase.UserRepository) *FSMService {
+	return &FSMService{OrderRepo: OrderRepo, ProductRepo: ProductRepo, UserRepo: UserRepo, FSMRepo: FSMRepo}
 }
 
 func (Service *FSMService) GetCurrentState(id int64) (string, error) {
