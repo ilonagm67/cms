@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/mymmrac/telego"
+	th "github.com/mymmrac/telego/telegohandler"
 )
 
 type Router struct {
@@ -33,8 +34,12 @@ func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *teleg
 
 func (r *Router) Init() {
 	updates, _ := r.Bot.UpdatesViaLongPolling(context.Background(), nil)
+	bh, _ := th.NewBotHandler(r.Bot, updates)
+	r.RegisterHandlers(bh)
+	bh.Start()
+}
 
-	for update := range updates {
-		log.Println(update)
-	}
+func (r *Router) RegisterHandlers(bh *th.BotHandler) {
+	bh.Handle(r.UserHandler.HandleStart, th.CommandEqual("start"))
+	bh.Handle(r.UserHandler.HandleName, r.UserHandler.StatePredicate("name"))
 }

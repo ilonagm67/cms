@@ -8,18 +8,27 @@ import (
 
 type UserService struct {
 	UserRepo usecase.UserRepository
+	FSMRepo  usecase.FSMRepository
 }
 
-func NewUserService(UserRepo usecase.UserRepository) *UserService {
-	return &UserService{UserRepo: UserRepo}
+func NewUserService(UserRepo usecase.UserRepository, FSMRepo usecase.FSMRepository) *UserService {
+	return &UserService{UserRepo: UserRepo, FSMRepo: FSMRepo}
 }
 
-func (Service *UserService) Add(id int64, name string) error {
+func (Service *UserService) Start(id int64) error {
+	err := Service.UserRepo.Add(id, &entity.User{UserID: id})
+	if err != nil {
+		return err
+	}
+	return Service.FSMRepo.Set(id, "name")
+}
+
+func (Service *UserService) ProcessName(id int64, name string) error {
 	err := Service.UserRepo.Add(id, &entity.User{UserID: id, Name: name})
 	if err != nil {
 		return err
 	}
-	return nil
+	return Service.FSMRepo.Set(id, "phone")
 }
 
 func (Service *UserService) Delete(id int64) error {

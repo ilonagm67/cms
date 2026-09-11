@@ -10,13 +10,15 @@ import (
 )
 
 func main() {
+	fsmrepo := memory.NewFSMRepository()
 	orderrepo := memory.NewOrderRepository()
 	productrepo := memory.NewProductRepository()
 	userrepo := memory.NewUserRepository()
 
+	fsmservice := service.NewFSMService(fsmrepo)
 	orderservice := service.NewOrderService(orderrepo)
 	productservice := service.NewProductService(productrepo)
-	userservice := service.NewUserService(userrepo)
+	userservice := service.NewUserService(userrepo, fsmrepo)
 
 	weborderhandler := web.NewOrderHandler(orderservice)
 	webproducthandler := web.NewProductHandler(productservice)
@@ -24,7 +26,7 @@ func main() {
 
 	tgorderhandler := telegram.NewOrderHandler(orderservice, userservice)
 	tgproducthandler := telegram.NewProductHandler(productservice)
-	tguserhandler := telegram.NewUserHandler(userservice)
+	tguserhandler := telegram.NewUserHandler(userservice, fsmservice)
 	tgquestionhandler := telegram.NewQuestionHandler(userservice)
 
 	httproute := http.NewRouter(weborderhandler, webproducthandler, webuserhandler)
