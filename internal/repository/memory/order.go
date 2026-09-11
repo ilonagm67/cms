@@ -17,11 +17,7 @@ func NewOrderRepository() *OrderRepository {
 
 func (repo *OrderRepository) Add(ID int64, Order *entity.Order) error {
 	repo.orders[ID] = Order
-	_, ok := repo.orders[ID]
-	if ok {
-		return nil
-	}
-	return errors.New("Order Not Created")
+	return nil
 }
 
 func (repo *OrderRepository) Get(ID int64) (*entity.Order, error) {

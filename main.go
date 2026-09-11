@@ -24,13 +24,12 @@ func main() {
 	webproducthandler := web.NewProductHandler(productservice)
 	webuserhandler := web.NewUserHandler(userservice)
 
-	tgorderhandler := telegram.NewOrderHandler(orderservice, userservice)
-	tgproducthandler := telegram.NewProductHandler(productservice)
+	tgorderhandler := telegram.NewOrderHandler(fsmservice)
+	tgproducthandler := telegram.NewProductHandler(fsmservice)
 	tguserhandler := telegram.NewUserHandler(fsmservice)
-	tgquestionhandler := telegram.NewQuestionHandler(userservice)
 
 	httproute := http.NewRouter(weborderhandler, webproducthandler, webuserhandler)
-	tgroute := tg.NewRouter(tgorderhandler, tgproducthandler, tguserhandler, tgquestionhandler)
+	tgroute := tg.NewRouter(tgorderhandler, tgproducthandler, tguserhandler)
 
 	go httproute.Init()
 	go tgroute.Init()

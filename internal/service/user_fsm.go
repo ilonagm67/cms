@@ -23,12 +23,12 @@ func (Service *FSMService) UserProcessName(id int64, name string) error {
 	return Service.FSMRepo.Set(id, "user_phone")
 }
 
-func (Service *FSMService) UserProcessPhone(id int64, phone string) error {
+func (Service *FSMService) UserProcessPhone(id int64, number string) error {
 	user, err := Service.UserRepo.Get(id)
 	if err != nil {
 		return err
 	}
-	user.Number = phone
+	user.Number = number
 	err = Service.UserRepo.Add(id, user)
 	if err != nil {
 		return err

@@ -17,10 +17,28 @@ var MainKeyboard = tu.Keyboard(
 	tu.KeyboardRow(
 		tu.KeyboardButton("📞Контакты"),
 	),
-)
+).WithOneTimeKeyboard().WithResizeKeyboard()
 
 var NumberKeyboard = tu.Keyboard(
 	tu.KeyboardRow(
 		tu.KeyboardButton("Отправить номер телефона").WithRequestContact(),
 	),
-)
+).WithOneTimeKeyboard().WithResizeKeyboard()
+
+var DeliveryKeyboard = tu.Keyboard(
+	tu.KeyboardRow(
+		tu.KeyboardButton("Новая Почта"),
+		tu.KeyboardButton("Укр Почта"),
+	),
+	tu.KeyboardRow(
+		tu.KeyboardButton("Самовывоз"),
+		tu.KeyboardButton("Доставка"),
+	),
+).WithOneTimeKeyboard().WithResizeKeyboard()
+
+var PayTypeKeyboard = tu.Keyboard(
+	tu.KeyboardRow(
+		tu.KeyboardButton("Перевод на карту"),
+		tu.KeyboardButton("Оплата при получении"),
+	),
+).WithOneTimeKeyboard().WithResizeKeyboard()

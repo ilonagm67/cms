@@ -11,14 +11,13 @@ import (
 )
 
 type Router struct {
-	Bot             *telego.Bot
-	OrderHandler    *telegram.OrderHandler
-	ProductHandler  *telegram.ProductHandler
-	UserHandler     *telegram.UserHandler
-	QuestionHandler *telegram.QuestionHandler
+	Bot            *telego.Bot
+	OrderHandler   *telegram.OrderHandler
+	ProductHandler *telegram.ProductHandler
+	UserHandler    *telegram.UserHandler
 }
 
-func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *telegram.UserHandler, Qh *telegram.QuestionHandler) *Router {
+func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *telegram.UserHandler) *Router {
 	token := os.Getenv("TOKEN")
 	if token == "" {
 		log.Fatal("env TOKEN not found")
@@ -29,7 +28,7 @@ func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *teleg
 		log.Fatal(err)
 	}
 
-	return &Router{Bot: bot, OrderHandler: Oh, ProductHandler: Ph, UserHandler: Uh, QuestionHandler: Qh}
+	return &Router{Bot: bot, OrderHandler: Oh, ProductHandler: Ph, UserHandler: Uh}
 }
 
 func (r *Router) Init() {
@@ -43,4 +42,11 @@ func (r *Router) RegisterHandlers(bh *th.BotHandler) {
 	bh.Handle(r.UserHandler.HandleStart, th.CommandEqual("start"))
 	bh.Handle(r.UserHandler.HandleName, r.UserHandler.StatePredicate("user_name"))
 	bh.Handle(r.UserHandler.HandlePhone, r.UserHandler.StatePredicate("user_phone"))
+	bh.Handle(r.OrderHandler.HandleStart, th.TextEqual("🛍Заказать товар"))
+	bh.Handle(r.OrderHandler.HandleOrderProducts, r.UserHandler.StatePredicate("order_products"))
+	bh.Handle(r.OrderHandler.HandleOrderProductsWeight, r.UserHandler.StatePredicate("order_products_weight"))
+	bh.Handle(r.OrderHandler.HandleOrderProductsCount, r.UserHandler.StatePredicate("order_products_count"))
+	bh.Handle(r.OrderHandler.HandleOrderDelivery, r.UserHandler.StatePredicate("order_delivery"))
+	bh.Handle(r.OrderHandler.HandleOrderPayType, r.UserHandler.StatePredicate("order_paytype"))
+	bh.Handle(r.OrderHandler.HandleOrderAddress, r.UserHandler.StatePredicate("order_address"))
 }

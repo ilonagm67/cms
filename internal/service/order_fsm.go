@@ -3,17 +3,60 @@ package service
 import "cms/internal/entity"
 
 func (Service *FSMService) OrderStart(id int64) error {
-	err := Service.UserRepo.Add(id, &entity.User{UserID: id})
+	err := Service.OrderRepo.Add(id, &entity.Order{UserID: id})
 	if err != nil {
 		return err
 	}
-	return Service.FSMRepo.Set(id, "name")
+	return Service.FSMRepo.Set(id, "order_products")
 }
 
-func (Service *FSMService) OrderProcessName(id int64, name string) error {
-	err := Service.UserRepo.Add(id, &entity.User{UserID: id, Name: name})
+func (Service *FSMService) ProcessOrderProducts(id int64, product string) error {
+	return Service.FSMRepo.Set(id, "order_products_weight")
+}
+
+func (Service *FSMService) ProcessOrderProductsWeight(id int64, weight string) error {
+	return Service.FSMRepo.Set(id, "order_products_count")
+}
+
+func (Service *FSMService) ProcessOrderProductsCount(id int64, count string) error {
+	return Service.FSMRepo.Set(id, "order_delivery")
+}
+
+func (Service *FSMService) ProcessOrderDelivery(id int64, delivery string) error {
+	order, err := Service.OrderRepo.Get(id)
 	if err != nil {
 		return err
 	}
-	return Service.FSMRepo.Set(id, "phone")
+	order.Delivery = delivery
+	err = Service.OrderRepo.Add(id, order)
+	if err != nil {
+		return err
+	}
+	return Service.FSMRepo.Set(id, "order_paytype")
+}
+
+func (Service *FSMService) ProcessOrderPayType(id int64, paytype string) error {
+	order, err := Service.OrderRepo.Get(id)
+	if err != nil {
+		return err
+	}
+	order.PayType = paytype
+	err = Service.OrderRepo.Add(id, order)
+	if err != nil {
+		return err
+	}
+	return Service.FSMRepo.Set(id, "order_address")
+}
+
+func (Service *FSMService) ProcessOrderAddress(id int64, address string) error {
+	order, err := Service.OrderRepo.Get(id)
+	if err != nil {
+		return err
+	}
+	order.Address = address
+	err = Service.OrderRepo.Add(id, order)
+	if err != nil {
+		return err
+	}
+	return Service.FSMRepo.Set(id, "")
 }

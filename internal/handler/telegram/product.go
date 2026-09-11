@@ -5,9 +5,9 @@ import (
 )
 
 type ProductHandler struct {
-	ProductService *service.ProductService
+	FSMService *service.FSMService
 }
 
-func NewProductHandler(ProductService *service.ProductService) *ProductHandler {
-	return &ProductHandler{ProductService: ProductService}
+func NewProductHandler(FSMService *service.FSMService) *ProductHandler {
+	return &ProductHandler{FSMService: FSMService}
 }
