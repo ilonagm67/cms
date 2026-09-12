@@ -13,5 +13,6 @@ type Product struct {
 	Description string
 	Image       string
 	Weight      int
+	Count       int
 	Price       float64
 }

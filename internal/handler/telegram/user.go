@@ -5,6 +5,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
@@ -12,11 +14,12 @@ import (
 )
 
 type UserHandler struct {
-	FSMService *service.FSMService
+	FSMService  *service.FSMService
+	UserService *service.UserService
 }
 
-func NewUserHandler(FSMService *service.FSMService) *UserHandler {
-	return &UserHandler{FSMService: FSMService}
+func NewUserHandler(FSMService *service.FSMService, UserService *service.UserService) *UserHandler {
+	return &UserHandler{FSMService: FSMService, UserService: UserService}
 }
 
 func (handler *UserHandler) StatePredicate(targetState string) th.Predicate {
@@ -31,6 +34,60 @@ func (handler *UserHandler) StatePredicate(targetState string) th.Predicate {
 		}
 		return state == targetState
 	}
+}
+
+func (handler *UserHandler) Middleware(ctx *th.Context, update telego.Update) error {
+	if update.Message.Text != "/start" {
+		_, err := handler.UserService.Get(update.Message.Chat.ID)
+		if err != nil {
+			_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+				tu.ID(update.Message.Chat.ID),
+				fmt.Sprintf("Введите /start"),
+			))
+			return err
+		}
+	}
+	return ctx.Next(update)
+}
+
+func (handler *UserHandler) HandleQuestionStart(ctx *th.Context, update telego.Update) error {
+	err := handler.FSMService.UserQuestionStart(update.Message.Chat.ID)
+	if err != nil {
+		log.Println(err)
+		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+			tu.ID(update.Message.Chat.ID),
+			fmt.Sprintf("Произошла ошибка!"),
+		))
+		return err
+	}
+	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+		tu.ID(update.Message.Chat.ID),
+		fmt.Sprintf("Введите вопрос:"),
+	))
+	return err
+}
+
+func (handler *UserHandler) HandleQuestionProcess(ctx *th.Context, update telego.Update) error {
+	err := handler.FSMService.UserQuestionProcess(update.Message.Chat.ID)
+	if err != nil {
+		log.Println(err)
+		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+			tu.ID(update.Message.Chat.ID),
+			fmt.Sprintf("Произошла ошибка!"),
+		))
+		return err
+	}
+	adminID := os.Getenv("ADMIN")
+	ID, _ := strconv.ParseInt(adminID, 10, 64)
+	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+		tu.ID(ID),
+		fmt.Sprintf(update.Message.Text),
+	))
+	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+		tu.ID(update.Message.Chat.ID),
+		fmt.Sprintf("Вопрос отправлен!"),
+	))
+	return nil
 }
 
 func (handler *UserHandler) HandleStart(ctx *th.Context, update telego.Update) error {

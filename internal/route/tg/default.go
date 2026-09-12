@@ -23,6 +23,11 @@ func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *teleg
 		log.Fatal("env TOKEN not found")
 	}
 
+	admin := os.Getenv("ADMIN")
+	if admin == "" {
+		log.Fatal("env ADMIN not found")
+	}
+
 	bot, err := telego.NewBot(token, telego.WithDefaultDebugLogger())
 	if err != nil {
 		log.Fatal(err)
@@ -34,6 +39,7 @@ func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *teleg
 func (r *Router) Init() {
 	updates, _ := r.Bot.UpdatesViaLongPolling(context.Background(), nil)
 	bh, _ := th.NewBotHandler(r.Bot, updates)
+	bh.Use(r.UserHandler.Middleware)
 	r.RegisterHandlers(bh)
 	bh.Start()
 }
@@ -42,6 +48,8 @@ func (r *Router) RegisterHandlers(bh *th.BotHandler) {
 	bh.Handle(r.UserHandler.HandleStart, th.CommandEqual("start"))
 	bh.Handle(r.UserHandler.HandleName, r.UserHandler.StatePredicate("user_name"))
 	bh.Handle(r.UserHandler.HandlePhone, r.UserHandler.StatePredicate("user_phone"))
+	bh.Handle(r.UserHandler.HandleQuestionStart, th.TextEqual("❓Вопрос"))
+	bh.Handle(r.UserHandler.HandleQuestionProcess, r.UserHandler.StatePredicate("user_question"))
 	bh.Handle(r.OrderHandler.HandleStart, th.TextEqual("🛍Заказать товар"))
 	bh.Handle(r.OrderHandler.HandleOrderProducts, r.UserHandler.StatePredicate("order_products"))
 	bh.Handle(r.OrderHandler.HandleOrderProductsWeight, r.UserHandler.StatePredicate("order_products_weight"))

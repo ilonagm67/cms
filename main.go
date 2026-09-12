@@ -26,7 +26,7 @@ func main() {
 
 	tgorderhandler := telegram.NewOrderHandler(fsmservice)
 	tgproducthandler := telegram.NewProductHandler(fsmservice)
-	tguserhandler := telegram.NewUserHandler(fsmservice)
+	tguserhandler := telegram.NewUserHandler(fsmservice, userservice)
 
 	httproute := http.NewRouter(weborderhandler, webproducthandler, webuserhandler)
 	tgroute := tg.NewRouter(tgorderhandler, tgproducthandler, tguserhandler)
