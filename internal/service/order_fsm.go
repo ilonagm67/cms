@@ -118,7 +118,12 @@ func (Service *FSMService) ProcessOrderAddress(id int64, text string) (string, e
 		return "Заказов не найдено!", err
 	}
 	if order.Delivery == "Самовывоз" {
-		order.Address = "База"
+		switch text {
+		case "База":
+			order.Address = text
+		default:
+			return "Выберите один из вариантов!", errors.New(fmt.Sprintf("ID: %v, Enter: %s", id, text))
+		}
 	} else {
 		order.Address = text
 	}

@@ -36,6 +36,12 @@ var DeliveryKeyboard = tu.Keyboard(
 	),
 ).WithOneTimeKeyboard().WithResizeKeyboard()
 
+var DeliveryBaseKeyboard = tu.Keyboard(
+	tu.KeyboardRow(
+		tu.KeyboardButton("База"),
+	),
+).WithOneTimeKeyboard().WithResizeKeyboard()
+
 var PayTypeKeyboard = tu.Keyboard(
 	tu.KeyboardRow(
 		tu.KeyboardButton("Перевод на карту"),

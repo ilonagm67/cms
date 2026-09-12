@@ -24,7 +24,7 @@ func main() {
 	webproducthandler := web.NewProductHandler(productservice)
 	webuserhandler := web.NewUserHandler(userservice)
 
-	tgorderhandler := telegram.NewOrderHandler(fsmservice)
+	tgorderhandler := telegram.NewOrderHandler(fsmservice, orderservice)
 	tgproducthandler := telegram.NewProductHandler(fsmservice)
 	tguserhandler := telegram.NewUserHandler(fsmservice, userservice)
 
