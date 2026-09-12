@@ -51,29 +51,29 @@ func (handler *UserHandler) Middleware(ctx *th.Context, update telego.Update) er
 }
 
 func (handler *UserHandler) HandleQuestionStart(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.UserQuestionStart(update.Message.Chat.ID)
+	text, err := handler.FSMService.UserQuestionStart(update.Message.Chat.ID)
 	if err != nil {
 		log.Println(err)
 		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка!"),
+			fmt.Sprintf(text),
 		))
 		return err
 	}
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Введите вопрос:"),
+		fmt.Sprintf(text),
 	))
 	return err
 }
 
 func (handler *UserHandler) HandleQuestionProcess(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.UserQuestionProcess(update.Message.Chat.ID)
+	text, err := handler.FSMService.UserQuestionProcess(update.Message.Chat.ID)
 	if err != nil {
 		log.Println(err)
 		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка!"),
+			fmt.Sprintf(text),
 		))
 		return err
 	}
@@ -85,7 +85,7 @@ func (handler *UserHandler) HandleQuestionProcess(ctx *th.Context, update telego
 	))
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Вопрос отправлен!"),
+		fmt.Sprintf(text),
 	))
 	return nil
 }
@@ -95,64 +95,63 @@ func (handler *UserHandler) HandleStart(ctx *th.Context, update telego.Update) e
 		tu.ID(update.Message.Chat.ID),
 		fmt.Sprintf("Добро пожаловать в наш магазин!"),
 	))
-	err := handler.FSMService.UserStart(update.Message.Chat.ID)
+	text, err := handler.FSMService.UserStart(update.Message.Chat.ID)
 	if err != nil {
 		log.Println(err)
 		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка!"),
+			fmt.Sprintf(text),
 		))
 		return err
 	}
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Для регистрации введите ваше имя:"),
+		fmt.Sprintf(text),
 	))
 	return nil
 }
 
 func (handler *UserHandler) HandleName(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.UserProcessName(update.Message.Chat.ID, update.Message.Text)
+	text, err := handler.FSMService.UserProcessName(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
 		log.Println(err)
 		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка!"),
+			fmt.Sprintf(text),
 		))
 		return err
 	}
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Введите Ваш Телефон:"),
+		fmt.Sprintf(text),
 	).WithReplyMarkup(NumberKeyboard).WithProtectContent())
 	return nil
 }
 
 func (handler *UserHandler) HandlePhone(ctx *th.Context, update telego.Update) error {
 	if update.Message.Text == "" {
-		err := handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Contact.PhoneNumber)
+		text, err := handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Contact.PhoneNumber)
 		if err != nil {
 			log.Println(err)
 			_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 				tu.ID(update.Message.Chat.ID),
-				fmt.Sprintf("Произошла ошибка!"),
-			))
-			return err
-		}
-	} else {
-		err := handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Text)
-		if err != nil {
-			log.Println(err)
-			_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-				tu.ID(update.Message.Chat.ID),
-				fmt.Sprintf("Произошла ошибка!"),
+				fmt.Sprintf(text),
 			))
 			return err
 		}
 	}
+	text, err := handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Text)
+	if err != nil {
+		log.Println(err)
+		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+			tu.ID(update.Message.Chat.ID),
+			fmt.Sprintf(text),
+		))
+		return err
+	}
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Вы успешно зарегистрировались!"),
+		fmt.Sprintf(text),
 	))
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),

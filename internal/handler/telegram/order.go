@@ -3,7 +3,6 @@ package telegram
 import (
 	"cms/internal/service"
 	"fmt"
-	"log"
 
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
@@ -19,120 +18,113 @@ func NewOrderHandler(FSMService *service.FSMService) *OrderHandler {
 }
 
 func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.OrderStart(update.Message.Chat.ID)
+	text, err := handler.FSMService.OrderStart(update.Message.Chat.ID)
 	if err != nil {
-		log.Println(err)
 		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка!"),
+			fmt.Sprintf(text),
 		))
 		return err
 	}
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Выберите Продукты:"),
+		fmt.Sprintf(text),
 	))
 	return nil
 }
 
 func (handler *OrderHandler) HandleOrderProducts(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
+	text, err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		log.Println(err)
 		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка!"),
+			fmt.Sprintf(text),
 		))
 		return err
 	}
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Выберите Вес:"),
+		fmt.Sprintf(text),
 	))
 	return nil
 }
 
 func (handler *OrderHandler) HandleOrderProductsWeight(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.ProcessOrderProductsWeight(update.Message.Chat.ID, update.Message.Text)
+	text, err := handler.FSMService.ProcessOrderProductsWeight(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		log.Println(err)
 		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка!"),
+			fmt.Sprintf(text),
 		))
 		return err
 	}
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Выберите Количество:"),
+		fmt.Sprintf(text),
 	))
 	return nil
 }
 
 func (handler *OrderHandler) HandleOrderProductsCount(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.ProcessOrderProductsCount(update.Message.Chat.ID, update.Message.Text)
+	text, err := handler.FSMService.ProcessOrderProductsCount(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		log.Println(err)
 		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка!"),
+			fmt.Sprintf(text),
 		))
 		return err
 	}
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Выберите Доставку:"),
+		fmt.Sprintf(text),
 	).WithReplyMarkup(DeliveryKeyboard).WithProtectContent())
 	return nil
 }
 
 func (handler *OrderHandler) HandleOrderDelivery(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.ProcessOrderDelivery(update.Message.Chat.ID, update.Message.Text)
+	text, err := handler.FSMService.ProcessOrderDelivery(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		log.Println(err)
 		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка!"),
+			fmt.Sprintf(text),
 		))
 		return err
 	}
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Выберите cпособ оплаты:"),
+		fmt.Sprintf(text),
 	).WithReplyMarkup(PayTypeKeyboard).WithProtectContent())
 	return nil
 }
 
 func (handler *OrderHandler) HandleOrderPayType(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.ProcessOrderPayType(update.Message.Chat.ID, update.Message.Text)
+	text, err := handler.FSMService.ProcessOrderPayType(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		log.Println(err)
 		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка!"),
+			fmt.Sprintf(text),
 		))
 		return err
 	}
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Введите адрес доставки:"),
+		fmt.Sprintf(text),
 	))
 	return nil
 }
 
 func (handler *OrderHandler) HandleOrderAddress(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.ProcessOrderAddress(update.Message.Chat.ID, update.Message.Text)
+	text, err := handler.FSMService.ProcessOrderAddress(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		log.Println(err)
 		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка!"),
+			fmt.Sprintf(text),
 		))
 		return err
 	}
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Заказ создан!"),
+		fmt.Sprintf(text),
 	).WithReplyMarkup(MainKeyboard))
 	return nil
 }

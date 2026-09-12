@@ -28,7 +28,7 @@ func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *teleg
 		log.Fatal("env ADMIN not found")
 	}
 
-	bot, err := telego.NewBot(token, telego.WithDefaultDebugLogger())
+	bot, err := telego.NewBot(token, telego.WithDefaultLogger(false, true))
 	if err != nil {
 		log.Fatal(err)
 	}
