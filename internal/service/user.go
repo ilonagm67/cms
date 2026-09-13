@@ -7,11 +7,10 @@ import (
 
 type UserService struct {
 	UserRepo usecase.UserRepository
-	FSMRepo  usecase.FSMRepository
 }
 
-func NewUserService(UserRepo usecase.UserRepository, FSMRepo usecase.FSMRepository) *UserService {
-	return &UserService{UserRepo: UserRepo, FSMRepo: FSMRepo}
+func NewUserService(UserRepo usecase.UserRepository) *UserService {
+	return &UserService{UserRepo: UserRepo}
 }
 
 func (Service *UserService) Delete(id int64) error {

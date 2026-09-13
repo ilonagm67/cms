@@ -25,6 +25,12 @@ var NumberKeyboard = tu.Keyboard(
 	),
 ).WithOneTimeKeyboard().WithResizeKeyboard()
 
+var AdminCatalogKeyboard = tu.Keyboard(
+	tu.KeyboardRow(
+		tu.KeyboardButton("Добавить товар"),
+	),
+).WithOneTimeKeyboard().WithResizeKeyboard()
+
 var DeliveryKeyboard = tu.Keyboard(
 	tu.KeyboardRow(
 		tu.KeyboardButton("Новая Почта"),

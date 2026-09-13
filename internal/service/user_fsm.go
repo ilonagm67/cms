@@ -13,7 +13,7 @@ func (Service *FSMService) UserQuestionProcess(id int64) (string, error) {
 }
 
 func (Service *FSMService) UserStart(id int64) (string, error) {
-	err := Service.UserRepo.Add(id, &entity.User{UserID: id})
+	err := Service.UserRepo.Add(&entity.User{ID: id})
 	if err != nil {
 		return "Не удалось добавить пользователя!", err
 	}
@@ -27,7 +27,7 @@ func (Service *FSMService) UserProcessName(id int64, name string) (string, error
 		return "Не удалось найти пользователя!", err
 	}
 	user.Name = name
-	err = Service.UserRepo.Add(id, user)
+	err = Service.UserRepo.Add(user)
 	if err != nil {
 		return "Не удалось добавить пользователя!", err
 	}
@@ -41,7 +41,7 @@ func (Service *FSMService) UserProcessPhone(id int64, number string) (string, er
 		return "Не удалось найти пользователя!", err
 	}
 	user.Number = number
-	err = Service.UserRepo.Add(id, user)
+	err = Service.UserRepo.Add(user)
 	if err != nil {
 		return "Не удалось добавить пользователя!", err
 	}

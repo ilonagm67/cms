@@ -32,5 +32,5 @@ func (repo *OrderRepository) List() (map[int64]*entity.Order, error) {
 	if len(repo.orders) > 0 {
 		return repo.orders, nil
 	}
-	return nil, errors.New("No Items in Database")
+	return nil, errors.New("No Items in Database Orders")
 }

@@ -7,7 +7,7 @@ const (
 )
 
 type User struct {
-	UserID int64
+	ID     int64
 	Name   string
 	Number string
 }

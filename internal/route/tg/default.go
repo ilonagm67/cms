@@ -57,4 +57,7 @@ func (r *Router) RegisterHandlers(bh *th.BotHandler) {
 	bh.Handle(r.OrderHandler.HandleOrderDelivery, r.UserHandler.StatePredicate("order_delivery"))
 	bh.Handle(r.OrderHandler.HandleOrderPayType, r.UserHandler.StatePredicate("order_paytype"))
 	bh.Handle(r.OrderHandler.HandleOrderAddress, r.UserHandler.StatePredicate("order_address"))
+	bh.Handle(r.ProductHandler.HandleStart, th.TextEqual("🛒Каталог"))
+	bh.Handle(r.ProductHandler.HandleCatalogName, r.UserHandler.StatePredicate("product_list"))
+	bh.Handle(r.ProductHandler.HandleCatalogWeight, r.UserHandler.StatePredicate("product_list_weight"))
 }

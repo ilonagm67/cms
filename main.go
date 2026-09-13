@@ -18,14 +18,14 @@ func main() {
 	fsmservice := service.NewFSMService(fsmrepo, orderrepo, productrepo, userrepo)
 	orderservice := service.NewOrderService(orderrepo)
 	productservice := service.NewProductService(productrepo)
-	userservice := service.NewUserService(userrepo, fsmrepo)
+	userservice := service.NewUserService(userrepo)
 
 	weborderhandler := web.NewOrderHandler(orderservice)
 	webproducthandler := web.NewProductHandler(productservice)
 	webuserhandler := web.NewUserHandler(userservice)
 
 	tgorderhandler := telegram.NewOrderHandler(fsmservice, orderservice)
-	tgproducthandler := telegram.NewProductHandler(fsmservice)
+	tgproducthandler := telegram.NewProductHandler(fsmservice, productservice, userservice)
 	tguserhandler := telegram.NewUserHandler(fsmservice, userservice)
 
 	httproute := http.NewRouter(weborderhandler, webproducthandler, webuserhandler)

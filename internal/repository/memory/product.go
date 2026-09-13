@@ -45,5 +45,5 @@ func (repo *ProductRepository) List() (map[string]map[int]*entity.Product, error
 	if len(repo.products) > 0 {
 		return repo.products, nil
 	}
-	return nil, errors.New("No Items in Database")
+	return nil, errors.New("No Items in Database Products")
 }

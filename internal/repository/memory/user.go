@@ -15,8 +15,8 @@ func NewUserRepository() *UserRepository {
 	}
 }
 
-func (repo *UserRepository) Add(ID int64, User *entity.User) error {
-	repo.users[ID] = User
+func (repo *UserRepository) Add(User *entity.User) error {
+	repo.users[User.ID] = User
 	return nil
 }
 
@@ -41,5 +41,5 @@ func (repo *UserRepository) List() (map[int64]*entity.User, error) {
 	if len(repo.users) > 0 {
 		return repo.users, nil
 	}
-	return nil, errors.New("No Items in Database")
+	return nil, errors.New("No Items in Database Users")
 }

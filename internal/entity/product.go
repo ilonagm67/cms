@@ -1,6 +1,8 @@
 package entity
 
 const (
+	StateAwaitingProductList        State = "product_list"
+	StateAwaitingProductListWeight  State = "product_list_weight"
 	StateAwaitingProductName        State = "product_name"
 	StateAwaitingProductDescription State = "product_description"
 	StateAwaitingProductImage       State = "product_image"

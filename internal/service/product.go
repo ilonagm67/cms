@@ -1,6 +1,7 @@
 package service
 
 import (
+	"cms/internal/entity"
 	"cms/internal/usecase"
 	"encoding/json"
 )
@@ -11,6 +12,14 @@ type ProductService struct {
 
 func NewProductService(ProductRepo usecase.ProductRepository) *ProductService {
 	return &ProductService{ProductRepo: ProductRepo}
+}
+
+func (Service *ProductService) Add(text string) error {
+	err := Service.ProductRepo.Add(&entity.Product{Name: text, Weight: 50})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (Service *ProductService) Delete(name string) error {
