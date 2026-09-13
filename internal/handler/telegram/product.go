@@ -149,12 +149,42 @@ func (handler *ProductHandler) HandleCatalogName(ctx *th.Context, update telego.
 			tu.ID(update.Message.Chat.ID),
 			fmt.Sprintf(text),
 		))
+		listjson, err := handler.ProductService.List()
+		var list map[string]map[int]*entity.Product
+		err = json.Unmarshal(listjson, &list)
+		if err != nil {
+			_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+				tu.ID(update.Message.Chat.ID),
+				fmt.Sprintf("Произошла ошибка"),
+			))
+			return err
+		}
+		for _, Product := range list {
+			for weight := range Product {
+				text = strconv.Itoa(weight)
+				_, err = ctx.Bot().SendMessage(ctx, tu.Message(
+					tu.ID(update.Message.Chat.ID),
+					fmt.Sprintf(text),
+				))
+				if err != nil {
+					return err
+				}
+			}
+		}
 		return nil
 	}
 }
 
 func (handler *ProductHandler) HandleCatalogWeight(ctx *th.Context, update telego.Update) error {
-	product, err := handler.FSMService.ProductCatalogWeight(update.Message.Chat.ID, update.Message.Text)
+	weight, err := strconv.Atoi(update.Message.Text)
+	if err != nil {
+		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+			tu.ID(update.Message.Chat.ID),
+			fmt.Sprintf("Введите нормальное число!"),
+		))
+		return err
+	}
+	product, err := handler.FSMService.ProductCatalogWeight(update.Message.Chat.ID, weight)
 	if err != nil {
 		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 			tu.ID(update.Message.Chat.ID),
@@ -165,6 +195,86 @@ func (handler *ProductHandler) HandleCatalogWeight(ctx *th.Context, update teleg
 	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
 		tu.ID(update.Message.Chat.ID),
 		fmt.Sprintf("Название: %s,\nОписание: %s\nВес: %v,\nЦена: %v", product.Name, product.Description, product.Weight, product.Price),
+	).WithReplyMarkup(MainKeyboard).WithProtectContent())
+	return nil
+}
+
+func (handler *ProductHandler) HandleCatalogAddName(ctx *th.Context, update telego.Update) error {
+	text, err := handler.FSMService.ProductAddingName(update.Message.Chat.ID, update.Message.Text)
+	if err != nil {
+		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+			tu.ID(update.Message.Chat.ID),
+			fmt.Sprintf(text),
+		))
+		return err
+	}
+	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+		tu.ID(update.Message.Chat.ID),
+		fmt.Sprintf(text),
 	))
+	return nil
+}
+
+func (handler *ProductHandler) HandleCatalogAddWeight(ctx *th.Context, update telego.Update) error {
+	text, err := handler.FSMService.ProductAddingWeight(update.Message.Chat.ID, update.Message.Text)
+	if err != nil {
+		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+			tu.ID(update.Message.Chat.ID),
+			fmt.Sprintf(text),
+		))
+		return err
+	}
+	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+		tu.ID(update.Message.Chat.ID),
+		fmt.Sprintf(text),
+	))
+	return nil
+}
+
+func (handler *ProductHandler) HandleCatalogAddDescription(ctx *th.Context, update telego.Update) error {
+	text, err := handler.FSMService.ProductAddingDescription(update.Message.Chat.ID, update.Message.Text)
+	if err != nil {
+		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+			tu.ID(update.Message.Chat.ID),
+			fmt.Sprintf(text),
+		))
+		return err
+	}
+	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+		tu.ID(update.Message.Chat.ID),
+		fmt.Sprintf(text),
+	))
+	return nil
+}
+
+func (handler *ProductHandler) HandleCatalogAddImage(ctx *th.Context, update telego.Update) error {
+	text, err := handler.FSMService.ProductAddingImage(update.Message.Chat.ID, update.Message.Text)
+	if err != nil {
+		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+			tu.ID(update.Message.Chat.ID),
+			fmt.Sprintf(text),
+		))
+		return err
+	}
+	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+		tu.ID(update.Message.Chat.ID),
+		fmt.Sprintf(text),
+	))
+	return nil
+}
+
+func (handler *ProductHandler) HandleCatalogAddPrice(ctx *th.Context, update telego.Update) error {
+	text, err := handler.FSMService.ProductAddingPrice(update.Message.Chat.ID, update.Message.Text)
+	if err != nil {
+		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+			tu.ID(update.Message.Chat.ID),
+			fmt.Sprintf(text),
+		))
+		return err
+	}
+	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
+		tu.ID(update.Message.Chat.ID),
+		fmt.Sprintf(text),
+	).WithReplyMarkup(MainKeyboard).WithProtectContent())
 	return nil
 }

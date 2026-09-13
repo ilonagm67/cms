@@ -16,5 +16,5 @@ type Product struct {
 	Image       string
 	Weight      int
 	Count       int
-	Price       float64
+	Price       int
 }
