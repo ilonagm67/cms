@@ -21,7 +21,7 @@ func NewOrderHandler(FSMService *service.FSMService, OrderService *service.Order
 func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) error {
 	err := handler.FSMService.OrderStart(update.Message.Chat.ID)
 	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
 	SendMessage(ctx, update.Message.Chat.ID, "Выберите Продукты:", nil)
@@ -31,7 +31,7 @@ func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) 
 func (handler *OrderHandler) HandleOrderProducts(ctx *th.Context, update telego.Update) error {
 	err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
 	SendMessage(ctx, update.Message.Chat.ID, "Выберите Вес:", nil)
@@ -46,7 +46,7 @@ func (handler *OrderHandler) HandleOrderProductsWeight(ctx *th.Context, update t
 	}
 	err = handler.FSMService.ProcessOrderProductsWeight(update.Message.Chat.ID, weight)
 	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
 	SendMessage(ctx, update.Message.Chat.ID, "Выберите Количество:", nil)
@@ -61,7 +61,7 @@ func (handler *OrderHandler) HandleOrderProductsCount(ctx *th.Context, update te
 	}
 	err = handler.FSMService.ProcessOrderProductsCount(update.Message.Chat.ID, count)
 	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
 	SendMessage(ctx, update.Message.Chat.ID, "Выберите Доставку:", DeliveryKeyboard)
@@ -73,25 +73,25 @@ func (handler *OrderHandler) HandleOrderDelivery(ctx *th.Context, update telego.
 	case "Новая Почта":
 		err := handler.FSMService.ProcessOrderDelivery(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
 	case "Укр Почта":
 		err := handler.FSMService.ProcessOrderDelivery(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
 	case "Самовывоз":
 		err := handler.FSMService.ProcessOrderDelivery(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
 	case "Доставка":
 		err := handler.FSMService.ProcessOrderDelivery(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
 	default:
@@ -107,24 +107,24 @@ func (handler *OrderHandler) HandleOrderPayType(ctx *th.Context, update telego.U
 	case "Перевод на карту":
 		pickup, err := handler.FSMService.ProcessOrderPayType(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
 		if pickup {
 			SendMessage(ctx, update.Message.Chat.ID, "Заказ создан!", MainKeyboard)
 		} else {
-			SendMessage(ctx, update.Message.Chat.ID, "", nil)
+			SendMessage(ctx, update.Message.Chat.ID, "Введите адрес:", nil)
 		}
 	case "Оплата при получении":
 		pickup, err := handler.FSMService.ProcessOrderPayType(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
 		if pickup {
 			SendMessage(ctx, update.Message.Chat.ID, "Заказ создан!", MainKeyboard)
 		} else {
-			SendMessage(ctx, update.Message.Chat.ID, "", nil)
+			SendMessage(ctx, update.Message.Chat.ID, "Введите адрес:", nil)
 		}
 	default:
 		SendMessage(ctx, update.Message.Chat.ID, "Выберите один из вариантов!", nil)
