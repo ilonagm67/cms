@@ -2,135 +2,125 @@ package service
 
 import (
 	"cms/internal/entity"
-	"errors"
-	"fmt"
-	"strconv"
 )
 
-func (Service *FSMService) OrderStart(id int64) (string, error) {
+func (Service *FSMService) OrderStart(id int64) error {
 	err := Service.OrderRepo.Add(id, &entity.Order{UserID: id})
 	if err != nil {
-		return "Не удалось создать заказ!", err
+		return err
 	}
-	Service.FSMRepo.Set(id, "order_products")
-	return "Выберите Продукты:", nil
+	err = Service.FSMRepo.Set(id, "order_products")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (Service *FSMService) ProcessOrderProducts(id int64, text string) (string, error) {
+func (Service *FSMService) ProcessOrderProducts(id int64, text string) error {
 	order, err := Service.OrderRepo.Get(id)
 	if err != nil {
-		return "Заказов не найдено!", err
+		return err
 	}
 	order.Products.Name = text
 	err = Service.OrderRepo.Add(id, order)
 	if err != nil {
-		return "Не удалось добавить заказ!", err
+		return err
 	}
-	Service.FSMRepo.Set(id, "order_products_weight")
-	return "Выберите Вес:", nil
+	err = Service.FSMRepo.Set(id, "order_products_weight")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (Service *FSMService) ProcessOrderProductsWeight(id int64, text string) (string, error) {
+func (Service *FSMService) ProcessOrderProductsWeight(id int64, weight int) error {
 	order, err := Service.OrderRepo.Get(id)
 	if err != nil {
-		return "Заказов не найдено!", err
-	}
-	weight, err := strconv.Atoi(text)
-	if err != nil {
-		return "Выберите нормальный вес!", err
+		return err
 	}
 	order.Products.Weight = weight
 	err = Service.OrderRepo.Add(id, order)
 	if err != nil {
-		return "Не удалось добавить заказ!", err
+		return err
 	}
 	Service.FSMRepo.Set(id, "order_products_count")
-	return "Выберите Количество:", nil
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (Service *FSMService) ProcessOrderProductsCount(id int64, text string) (string, error) {
+func (Service *FSMService) ProcessOrderProductsCount(id int64, count int) error {
 	order, err := Service.OrderRepo.Get(id)
 	if err != nil {
-		return "Заказов не найдено!", err
-	}
-	count, err := strconv.Atoi(text)
-	if err != nil {
-		return "Выберите нормальное количество!", err
+		return err
 	}
 	order.Products.Count = count
 	err = Service.OrderRepo.Add(id, order)
 	if err != nil {
-		return "Не удалось добавить заказ!", err
+		return err
 	}
-	Service.FSMRepo.Set(id, "order_delivery")
-	return "Выберите Доставку:", nil
+	err = Service.FSMRepo.Set(id, "order_delivery")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (Service *FSMService) ProcessOrderDelivery(id int64, text string) (string, error) {
+func (Service *FSMService) ProcessOrderDelivery(id int64, text string) error {
 	order, err := Service.OrderRepo.Get(id)
 	if err != nil {
-		return "Заказов не найдено!", err
+		return err
 	}
-	switch text {
-	case "Новая Почта":
-		order.Delivery = text
-	case "Укр Почта":
-		order.Delivery = text
-	case "Самовывоз":
-		order.Delivery = text
-	case "Доставка":
-		order.Delivery = text
-	default:
-		return "Выберите один из вариантов!", errors.New(fmt.Sprintf("ID: %v, Enter: %s", id, text))
-	}
+	order.Delivery = text
 	err = Service.OrderRepo.Add(id, order)
 	if err != nil {
-		return "Не удалось добавить заказ!", err
+		return err
 	}
-	Service.FSMRepo.Set(id, "order_paytype")
-	return "Выберите cпособ оплаты:", nil
+	err = Service.FSMRepo.Set(id, "order_paytype")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (Service *FSMService) ProcessOrderPayType(id int64, text string) (string, error) {
+func (Service *FSMService) ProcessOrderPayType(id int64, text string) (bool, error) {
 	order, err := Service.OrderRepo.Get(id)
 	if err != nil {
-		return "Заказов не найдено!", err
+		return false, err
 	}
-	switch text {
-	case "Перевод на карту":
-		order.PayType = text
-	case "Оплата при получении":
-		order.PayType = text
-	default:
-		return "Выберите один из вариантов!", errors.New(fmt.Sprintf("ID: %v, Enter: %s", id, text))
-	}
+	order.PayType = text
 	err = Service.OrderRepo.Add(id, order)
 	if err != nil {
-		return "Не удалось добавить заказ!", err
-	}
-	Service.FSMRepo.Set(id, "order_address")
-	return "Введите адрес доставки:", nil
-}
-
-func (Service *FSMService) ProcessOrderAddress(id int64, text string) (string, error) {
-	order, err := Service.OrderRepo.Get(id)
-	if err != nil {
-		return "Заказов не найдено!", err
+		return false, err
 	}
 	if order.Delivery == "Самовывоз" {
-		switch text {
-		case "База":
-			order.Address = text
-		default:
-			return "Выберите один из вариантов!", errors.New(fmt.Sprintf("ID: %v, Enter: %s", id, text))
+		err = Service.FSMRepo.Set(id, "order_base_address")
+		if err != nil {
+			return false, err
 		}
-	} else {
-		order.Address = text
+		return true, nil
 	}
+	err = Service.FSMRepo.Set(id, "order_address")
+	if err != nil {
+		return false, err
+	}
+	return false, nil
+}
+
+func (Service *FSMService) ProcessOrderAddress(id int64, text string) error {
+	order, err := Service.OrderRepo.Get(id)
+	if err != nil {
+		return err
+	}
+	order.Address = text
 	err = Service.OrderRepo.Add(id, order)
 	if err != nil {
-		return "Не удалось добавить заказ!", err
+		return err
 	}
-	Service.FSMRepo.Set(id, "")
-	return "Заказ создан!", nil
+	err = Service.FSMRepo.Set(id, "")
+	if err != nil {
+		return err
+	}
+	return nil
 }
