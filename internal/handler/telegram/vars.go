@@ -1,6 +1,8 @@
 package telegram
 
 import (
+	"github.com/mymmrac/telego"
+	th "github.com/mymmrac/telego/telegohandler"
 	tu "github.com/mymmrac/telego/telegoutil"
 )
 
@@ -21,7 +23,7 @@ var MainKeyboard = tu.Keyboard(
 
 var NumberKeyboard = tu.Keyboard(
 	tu.KeyboardRow(
-		tu.KeyboardButton("Отправить номер телефона").WithRequestContact(),
+		tu.KeyboardButton("📞Отправить номер телефона").WithRequestContact(),
 	),
 ).WithOneTimeKeyboard().WithResizeKeyboard()
 
@@ -54,3 +56,25 @@ var PayTypeKeyboard = tu.Keyboard(
 		tu.KeyboardButton("Оплата при получении"),
 	),
 ).WithOneTimeKeyboard().WithResizeKeyboard()
+
+var ReturnKeyboard = tu.Keyboard(
+	tu.KeyboardRow(
+		tu.KeyboardButton("🔙Назад"),
+	),
+).WithOneTimeKeyboard()
+
+func SendMessage(ctx *th.Context, ID int64, text string, keyboard telego.ReplyMarkup) error {
+	if keyboard != nil {
+		_, err := ctx.Bot().SendMessage(ctx, tu.Message(
+			tu.ID(ID),
+			text,
+		).WithReplyMarkup(keyboard))
+		return err
+	} else {
+		_, err := ctx.Bot().SendMessage(ctx, tu.Message(
+			tu.ID(ID),
+			text,
+		))
+		return err
+	}
+}

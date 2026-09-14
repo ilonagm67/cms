@@ -11,7 +11,6 @@ import (
 
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
-	tu "github.com/mymmrac/telego/telegoutil"
 )
 
 type ProductHandler struct {
@@ -28,36 +27,24 @@ func (handler *ProductHandler) HandleStart(ctx *th.Context, update telego.Update
 	adminstr := os.Getenv("ADMIN")
 	admin, err := strconv.ParseInt(adminstr, 10, 64)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка"),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 		return err
 	}
 	listjson, err := handler.ProductService.List()
 	if err != nil {
 		if admin != update.Message.Chat.ID {
-			_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-				tu.ID(update.Message.Chat.ID),
-				fmt.Sprintf("Произошла ошибка"),
-			))
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 			return err
 		}
 	} else {
 		var list map[string]map[int]*entity.Product
 		err = json.Unmarshal(listjson, &list)
 		if err != nil {
-			_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-				tu.ID(update.Message.Chat.ID),
-				fmt.Sprintf("Произошла ошибка"),
-			))
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 			return err
 		}
 		for Product := range list {
-			_, err = ctx.Bot().SendMessage(ctx, tu.Message(
-				tu.ID(update.Message.Chat.ID),
-				fmt.Sprintf(Product),
-			))
+			err := SendMessage(ctx, update.Message.Chat.ID, Product, nil)
 			if err != nil {
 				return err
 			}
@@ -66,22 +53,13 @@ func (handler *ProductHandler) HandleStart(ctx *th.Context, update telego.Update
 
 	text, err := handler.FSMService.ProductCatalogStart(update.Message.Chat.ID)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
 		return err
 	}
 	if admin != update.Message.Chat.ID {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
 	} else {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		).WithReplyMarkup(AdminCatalogKeyboard).WithProtectContent())
+		SendMessage(ctx, update.Message.Chat.ID, text, AdminCatalogKeyboard)
 	}
 	return nil
 }
@@ -90,84 +68,60 @@ func (handler *ProductHandler) HandleCatalogName(ctx *th.Context, update telego.
 	adminstr := os.Getenv("ADMIN")
 	admin, err := strconv.ParseInt(adminstr, 10, 64)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Ошибка"),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 		return err
 	}
 	switch update.Message.Text {
 	case "Добавить товар":
 		if admin != update.Message.Chat.ID {
-			_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-				tu.ID(update.Message.Chat.ID),
-				fmt.Sprintf("Ошибка"),
-			))
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 			userjson, err := handler.UserService.Get(update.Message.Chat.ID)
 			if err != nil {
-				_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-					tu.ID(update.Message.Chat.ID),
-					fmt.Sprintf("Ошибка"),
-				))
+				SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 				return err
 			}
 			var user entity.User
 			err = json.Unmarshal(userjson, &user)
 			if err != nil {
-				_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-					tu.ID(update.Message.Chat.ID),
-					fmt.Sprintf("Ошибка"),
-				))
+				SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 				return err
 			}
-			return errors.New("ID:%v, UserName:%s, Phone: %s, Want to create product")
-		} else {
-			text, err := handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
-			if err != nil {
-				_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-					tu.ID(update.Message.Chat.ID),
-					fmt.Sprintf(text),
-				))
-				return err
-			}
-			_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-				tu.ID(update.Message.Chat.ID),
-				fmt.Sprintf(text),
-			))
-			return nil
+			//err = fmt.Sprintf("ID: %d, UserName: %s, Phone: %s, Want to create product", user.ID, user.Name, user.Number)
+			return errors.New("Want to Create Product")
 		}
+		text, err := handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, text, nil)
+			return err
+		}
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
+		return nil
 	default:
 		text, err := handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-				tu.ID(update.Message.Chat.ID),
-				fmt.Sprintf(text),
-			))
+			SendMessage(ctx, update.Message.Chat.ID, text, nil)
 			return err
 		}
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
-		listjson, err := handler.ProductService.List()
-		var list map[string]map[int]*entity.Product
-		err = json.Unmarshal(listjson, &list)
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
+		encoded, err := handler.ProductService.List()
 		if err != nil {
-			_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-				tu.ID(update.Message.Chat.ID),
-				fmt.Sprintf("Произошла ошибка"),
-			))
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 			return err
 		}
-		for _, Product := range list {
-			for weight := range Product {
-				text = strconv.Itoa(weight)
-				_, err = ctx.Bot().SendMessage(ctx, tu.Message(
-					tu.ID(update.Message.Chat.ID),
-					fmt.Sprintf(text),
-				))
-				if err != nil {
-					return err
+		var list map[string]map[int]*entity.Product
+		err = json.Unmarshal(encoded, &list)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+			return err
+		}
+		for ProductName, Weights := range list {
+			for Weight, _ := range Weights {
+				if ProductName == update.Message.Text {
+					text = fmt.Sprintf("%d", Weight)
+					err := SendMessage(ctx, update.Message.Chat.ID, text, nil)
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -178,103 +132,75 @@ func (handler *ProductHandler) HandleCatalogName(ctx *th.Context, update telego.
 func (handler *ProductHandler) HandleCatalogWeight(ctx *th.Context, update telego.Update) error {
 	weight, err := strconv.Atoi(update.Message.Text)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Введите нормальное число!"),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, "Введите нормальное число!", nil)
 		return err
 	}
 	product, err := handler.FSMService.ProductCatalogWeight(update.Message.Chat.ID, weight)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf("Произошла ошибка!"),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 		return err
 	}
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Название: %s,\nОписание: %s\nВес: %v,\nЦена: %v", product.Name, product.Description, product.Weight, product.Price),
-	).WithReplyMarkup(MainKeyboard).WithProtectContent())
+	text := fmt.Sprintf("Название: %s\n\nОписание: %s\n\nВес: %d\nЦена: %d", product.Name, product.Description, product.Weight, product.Price)
+	SendMessage(ctx, update.Message.Chat.ID, text, MainKeyboard)
 	return nil
 }
 
 func (handler *ProductHandler) HandleCatalogAddName(ctx *th.Context, update telego.Update) error {
 	text, err := handler.FSMService.ProductAddingName(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
 		return err
 	}
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf(text),
-	))
+	SendMessage(ctx, update.Message.Chat.ID, text, nil)
 	return nil
 }
 
 func (handler *ProductHandler) HandleCatalogAddWeight(ctx *th.Context, update telego.Update) error {
-	text, err := handler.FSMService.ProductAddingWeight(update.Message.Chat.ID, update.Message.Text)
+	weight, err := strconv.Atoi(update.Message.Text)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, "Введите нормальное число!", nil)
 		return err
 	}
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf(text),
-	))
+	text, err := handler.FSMService.ProductAddingWeight(update.Message.Chat.ID, weight)
+	if err != nil {
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
+		return err
+	}
+	SendMessage(ctx, update.Message.Chat.ID, text, nil)
 	return nil
 }
 
 func (handler *ProductHandler) HandleCatalogAddDescription(ctx *th.Context, update telego.Update) error {
 	text, err := handler.FSMService.ProductAddingDescription(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
 		return err
 	}
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf(text),
-	))
+	SendMessage(ctx, update.Message.Chat.ID, text, nil)
 	return nil
 }
 
 func (handler *ProductHandler) HandleCatalogAddImage(ctx *th.Context, update telego.Update) error {
 	text, err := handler.FSMService.ProductAddingImage(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
 		return err
 	}
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf(text),
-	))
+	SendMessage(ctx, update.Message.Chat.ID, text, nil)
 	return nil
 }
 
 func (handler *ProductHandler) HandleCatalogAddPrice(ctx *th.Context, update telego.Update) error {
-	text, err := handler.FSMService.ProductAddingPrice(update.Message.Chat.ID, update.Message.Text)
+	price, err := strconv.Atoi(update.Message.Text)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, "Введите нормальное число!", nil)
 		return err
 	}
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf(text),
-	).WithReplyMarkup(MainKeyboard).WithProtectContent())
+	text, err := handler.FSMService.ProductAddingPrice(update.Message.Chat.ID, price)
+	if err != nil {
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
+		return err
+	}
+	SendMessage(ctx, update.Message.Chat.ID, text, MainKeyboard)
 	return nil
 }

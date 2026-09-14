@@ -6,5 +6,5 @@ type FSM struct {
 	UserID     int64
 	State      State
 	DataName   string
-	DataWeight string
+	DataWeight int
 }

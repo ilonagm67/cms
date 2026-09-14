@@ -2,7 +2,7 @@ package service
 
 import (
 	"cms/internal/entity"
-	"strconv"
+	"errors"
 )
 
 func (Service *FSMService) ProductCatalogStart(id int64) (string, error) {
@@ -11,20 +11,27 @@ func (Service *FSMService) ProductCatalogStart(id int64) (string, error) {
 }
 
 func (Service *FSMService) ProductCatalogName(id int64, text string) (string, error) {
-	switch text {
-	case "Добавить товар":
+	if text == "Добавить товар" {
 		Service.FSMRepo.Set(id, "product_name")
 		return "Введите Название:", nil
-	default:
-		Service.FSMRepo.Set(id, "product_list_weight")
-		fsm, err := Service.FSMRepo.GetData(id)
-		if err != nil {
-			return "", err
-		}
-		fsm.DataName = text
-		Service.FSMRepo.SetData(id, fsm)
-		return "Выберите вес:", nil
 	}
+	list, err := Service.ProductRepo.List()
+	if err != nil {
+		return "Не удалось найти список продуктов", err
+	}
+	for Product := range list {
+		if text == Product {
+			fsm, err := Service.FSMRepo.GetData(id)
+			if err != nil {
+				return "", err
+			}
+			fsm.DataName = text
+			fsm.State = "product_list_weight"
+			Service.FSMRepo.SetData(id, fsm)
+			return "Выберите вес:", nil
+		}
+	}
+	return "Продукт не найден!", errors.New("Product Not found")
 }
 
 func (Service *FSMService) ProductCatalogWeight(id int64, weight int) (*entity.Product, error) {
@@ -51,16 +58,12 @@ func (Service *FSMService) ProductAddingName(id int64, text string) (string, err
 	return "Введите вес:", nil
 }
 
-func (Service *FSMService) ProductAddingWeight(id int64, text string) (string, error) {
-	weight, err := strconv.Atoi(text)
-	if err != nil {
-		return "Введите нормальное число!", err
-	}
+func (Service *FSMService) ProductAddingWeight(id int64, weight int) (string, error) {
 	fsm, err := Service.FSMRepo.GetData(id)
 	if err != nil {
 		return "Не удалось найти сессию", err
 	}
-	fsm.DataWeight = text
+	fsm.DataWeight = weight
 	err = Service.ProductRepo.Add(&entity.Product{Name: fsm.DataName, Weight: weight})
 	if err != nil {
 		return "Не удалось создать продукт!", err
@@ -75,8 +78,7 @@ func (Service *FSMService) ProductAddingDescription(id int64, text string) (stri
 	if err != nil {
 		return "Не удалось найти сессию", err
 	}
-	weight, _ := strconv.Atoi(fsm.DataWeight)
-	product, err := Service.ProductRepo.Get(fsm.DataName, weight)
+	product, err := Service.ProductRepo.Get(fsm.DataName, fsm.DataWeight)
 	if err != nil {
 		return "Не удалось создать продукт!", err
 	}
@@ -95,12 +97,11 @@ func (Service *FSMService) ProductAddingImage(id int64, text string) (string, er
 	if err != nil {
 		return "Не удалось найти сессию", err
 	}
-	weight, _ := strconv.Atoi(fsm.DataWeight)
-	product, err := Service.ProductRepo.Get(fsm.DataName, weight)
+	product, err := Service.ProductRepo.Get(fsm.DataName, fsm.DataWeight)
 	if err != nil {
 		return "Не удалось создать продукт!", err
 	}
-	product.Description = text
+	product.Image = text
 	err = Service.ProductRepo.Add(product)
 	if err != nil {
 		return "Не удалось добавить изображение!", err
@@ -110,17 +111,12 @@ func (Service *FSMService) ProductAddingImage(id int64, text string) (string, er
 	return "Введите цену:", nil
 }
 
-func (Service *FSMService) ProductAddingPrice(id int64, text string) (string, error) {
+func (Service *FSMService) ProductAddingPrice(id int64, price int) (string, error) {
 	fsm, err := Service.FSMRepo.GetData(id)
 	if err != nil {
 		return "Не удалось найти сессию", err
 	}
-	weight, _ := strconv.Atoi(fsm.DataWeight)
-	price, err := strconv.Atoi(text)
-	if err != nil {
-		return "Введите нормальную цену!", err
-	}
-	product, err := Service.ProductRepo.Get(fsm.DataName, weight)
+	product, err := Service.ProductRepo.Get(fsm.DataName, fsm.DataWeight)
 	if err != nil {
 		return "Не удалось создать продукт!", err
 	}

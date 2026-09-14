@@ -3,13 +3,11 @@ package telegram
 import (
 	"cms/internal/service"
 	"context"
-	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
-	tu "github.com/mymmrac/telego/telegoutil"
 )
 
 type UserHandler struct {
@@ -39,10 +37,7 @@ func (handler *UserHandler) Middleware(ctx *th.Context, update telego.Update) er
 	if update.Message.Text != "/start" {
 		_, err := handler.UserService.Get(update.Message.Chat.ID)
 		if err != nil {
-			_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-				tu.ID(update.Message.Chat.ID),
-				fmt.Sprintf("Введите /start"),
-			))
+			SendMessage(ctx, update.Message.Chat.ID, "Введите /start", nil)
 			return err
 		}
 	}
@@ -52,74 +47,44 @@ func (handler *UserHandler) Middleware(ctx *th.Context, update telego.Update) er
 func (handler *UserHandler) HandleQuestionStart(ctx *th.Context, update telego.Update) error {
 	text, err := handler.FSMService.UserQuestionStart(update.Message.Chat.ID)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
 		return err
 	}
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf(text),
-	))
+	SendMessage(ctx, update.Message.Chat.ID, text, nil)
 	return nil
 }
 
 func (handler *UserHandler) HandleQuestionProcess(ctx *th.Context, update telego.Update) error {
 	text, err := handler.FSMService.UserQuestionProcess(update.Message.Chat.ID)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
 		return err
 	}
 	adminID := os.Getenv("ADMIN")
 	ID, _ := strconv.ParseInt(adminID, 10, 64)
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(ID),
-		fmt.Sprintf(update.Message.Text),
-	))
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf(text),
-	))
+	SendMessage(ctx, ID, update.Message.Text, nil)
+	SendMessage(ctx, update.Message.Chat.ID, text, nil)
 	return nil
 }
 
 func (handler *UserHandler) HandleStart(ctx *th.Context, update telego.Update) error {
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Добро пожаловать в наш магазин!"),
-	))
+	SendMessage(ctx, update.Message.Chat.ID, "Добро пожаловать в наш магазин!", nil)
 	text, err := handler.FSMService.UserStart(update.Message.Chat.ID)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
 		return err
 	}
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf(text),
-	))
+	SendMessage(ctx, update.Message.Chat.ID, text, nil)
 	return nil
 }
 
 func (handler *UserHandler) HandleName(ctx *th.Context, update telego.Update) error {
 	text, err := handler.FSMService.UserProcessName(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
 		return err
 	}
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf(text),
-	).WithReplyMarkup(NumberKeyboard).WithProtectContent())
+	SendMessage(ctx, update.Message.Chat.ID, text, NumberKeyboard)
 	return nil
 }
 
@@ -127,28 +92,16 @@ func (handler *UserHandler) HandlePhone(ctx *th.Context, update telego.Update) e
 	if update.Message.Text == "" {
 		text, err := handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Contact.PhoneNumber)
 		if err != nil {
-			_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-				tu.ID(update.Message.Chat.ID),
-				fmt.Sprintf(text),
-			))
+			SendMessage(ctx, update.Message.Chat.ID, text, nil)
 			return err
 		}
 	}
 	text, err := handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-			tu.ID(update.Message.Chat.ID),
-			fmt.Sprintf(text),
-		))
+		SendMessage(ctx, update.Message.Chat.ID, text, nil)
 		return err
 	}
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf(text),
-	))
-	_, _ = ctx.Bot().SendMessage(ctx, tu.Message(
-		tu.ID(update.Message.Chat.ID),
-		fmt.Sprintf("Выберите вариант из списка:"),
-	).WithReplyMarkup(MainKeyboard).WithProtectContent())
+	SendMessage(ctx, update.Message.Chat.ID, text, nil)
+	SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
 	return nil
 }
