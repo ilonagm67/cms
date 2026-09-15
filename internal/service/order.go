@@ -1,8 +1,8 @@
 package service
 
 import (
+	"cms/internal/entity"
 	"cms/internal/usecase"
-	"encoding/json"
 )
 
 type OrderService struct {
@@ -13,26 +13,18 @@ func NewOrderService(OrderRepo usecase.OrderRepository) *OrderService {
 	return &OrderService{OrderRepo: OrderRepo}
 }
 
-func (Service *OrderService) Get(id int64) ([]byte, error) {
+func (Service *OrderService) Get(id int64) (*entity.Order, error) {
 	order, err := Service.OrderRepo.Get(id)
 	if err != nil {
 		return nil, err
 	}
-	b, err := json.Marshal(order)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
+	return order, nil
 }
 
-func (Service *OrderService) List() ([]byte, error) {
+func (Service *OrderService) List() (map[int64]*entity.Order, error) {
 	list, err := Service.OrderRepo.List()
 	if err != nil {
 		return nil, err
 	}
-	json, err := json.Marshal(list)
-	if err != nil {
-		return nil, err
-	}
-	return json, nil
+	return list, nil
 }

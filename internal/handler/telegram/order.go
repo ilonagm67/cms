@@ -10,12 +10,12 @@ import (
 )
 
 type OrderHandler struct {
-	FSMService   *service.FSMService
-	OrderService *service.OrderService
+	FSMService     *service.FSMService
+	ProductService *service.ProductService
 }
 
-func NewOrderHandler(FSMService *service.FSMService, OrderService *service.OrderService) *OrderHandler {
-	return &OrderHandler{FSMService: FSMService, OrderService: OrderService}
+func NewOrderHandler(FSMService *service.FSMService, ProductService *service.ProductService) *OrderHandler {
+	return &OrderHandler{FSMService: FSMService, ProductService: ProductService}
 }
 
 func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) error {

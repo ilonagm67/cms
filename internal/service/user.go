@@ -1,8 +1,8 @@
 package service
 
 import (
+	"cms/internal/entity"
 	"cms/internal/usecase"
-	"encoding/json"
 )
 
 type UserService struct {
@@ -21,35 +21,23 @@ func (Service *UserService) Delete(id int64) error {
 	return nil
 }
 
-func (Service *UserService) Get(id int64) ([]byte, error) {
+func (Service *UserService) Get(id int64) (*entity.User, error) {
 	user, err := Service.UserRepo.Get(id)
 	if err != nil {
 		return nil, err
 	}
-	b, err := json.Marshal(user)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
+	return user, nil
 }
 
-func (Service *UserService) List() ([]byte, error) {
+func (Service *UserService) List() (map[int64]*entity.User, error) {
 	list, err := Service.UserRepo.List()
 	if err != nil {
 		return nil, err
 	}
-	json, err := json.Marshal(list)
-	if err != nil {
-		return nil, err
-	}
-	return json, nil
+	return list, nil
 }
 
-func (Service *UserService) Health() ([]byte, error) {
+func (Service *UserService) Health() (string, error) {
 	message := "Healthy"
-	json, err := json.Marshal(message)
-	if err != nil {
-		return nil, err
-	}
-	return json, nil
+	return message, nil
 }

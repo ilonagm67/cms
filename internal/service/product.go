@@ -3,7 +3,6 @@ package service
 import (
 	"cms/internal/entity"
 	"cms/internal/usecase"
-	"encoding/json"
 )
 
 type ProductService struct {
@@ -14,14 +13,6 @@ func NewProductService(ProductRepo usecase.ProductRepository) *ProductService {
 	return &ProductService{ProductRepo: ProductRepo}
 }
 
-func (Service *ProductService) Add(text string) error {
-	err := Service.ProductRepo.Add(&entity.Product{Name: text, Weight: 50})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (Service *ProductService) Delete(name string) error {
 	err := Service.ProductRepo.Delete(name)
 	if err != nil {
@@ -30,26 +21,18 @@ func (Service *ProductService) Delete(name string) error {
 	return nil
 }
 
-func (Service *ProductService) Get(name string, weight int) ([]byte, error) {
-	user, err := Service.ProductRepo.Get(name, weight)
+func (Service *ProductService) Get(name string, weight int) (*entity.Product, error) {
+	product, err := Service.ProductRepo.Get(name, weight)
 	if err != nil {
 		return nil, err
 	}
-	b, err := json.Marshal(user)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
+	return product, nil
 }
 
-func (Service *ProductService) List() ([]byte, error) {
+func (Service *ProductService) List() (map[string]map[int]*entity.Product, error) {
 	list, err := Service.ProductRepo.List()
 	if err != nil {
 		return nil, err
 	}
-	json, err := json.Marshal(list)
-	if err != nil {
-		return nil, err
-	}
-	return json, nil
+	return list, nil
 }
