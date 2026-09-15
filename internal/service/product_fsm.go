@@ -2,62 +2,45 @@ package service
 
 import (
 	"cms/internal/entity"
-	"errors"
-	"os"
-	"strconv"
 )
 
 func (Service *FSMService) ProductCatalogStart(id int64) error {
-	err := Service.FSMRepo.Set(id, "product_list")
+	Service.FSMRepo.Set(id, "product_list")
+	_, err := Service.FSMRepo.GetData(id)
 	if err != nil {
+		Service.FSMRepo.Set(id, "")
 		return err
 	}
 	return nil
 }
 
 func (Service *FSMService) ProductCatalogName(id int64, text string) error {
-	adminstr := os.Getenv("ADMIN")
-	admin, err := strconv.ParseInt(adminstr, 10, 64)
-	if err != nil {
-		return err
-	}
-	if text == "Добавить товар" {
-		if admin != id {
-			return errors.New("Want Add Product")
-		}
-		err := Service.FSMRepo.Set(id, "product_name")
+	switch text {
+	case "Добавить товар":
+		Service.FSMRepo.Set(id, "product_name")
+	default:
+		fsm, err := Service.FSMRepo.GetData(id)
 		if err != nil {
+			Service.FSMRepo.Set(id, "")
 			return err
 		}
+		fsm.DataName = text
+		fsm.State = "product_list_weight"
+		Service.FSMRepo.SetData(id, fsm)
 		return nil
-	} else {
-		list, err := Service.ProductRepo.List()
-		if err != nil {
-			return err
-		}
-		for Product := range list {
-			if text == Product {
-				fsm, err := Service.FSMRepo.GetData(id)
-				if err != nil {
-					return err
-				}
-				fsm.DataName = text
-				fsm.State = "product_list_weight"
-				Service.FSMRepo.SetData(id, fsm)
-				return nil
-			}
-		}
 	}
-	return errors.New("Product not Found!")
+	return nil
 }
 
 func (Service *FSMService) ProductCatalogWeight(id int64, weight int) (*entity.Product, error) {
 	fsm, err := Service.FSMRepo.GetData(id)
 	if err != nil {
+		Service.FSMRepo.Set(id, "")
 		return nil, err
 	}
 	product, err := Service.ProductRepo.Get(fsm.DataName, weight)
 	if err != nil {
+		Service.FSMRepo.Set(id, "")
 		return nil, err
 	}
 	Service.FSMRepo.Set(id, "")

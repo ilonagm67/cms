@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"cms/internal/service"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -31,7 +32,7 @@ func (handler *ProductHandler) HandleStart(ctx *th.Context, update telego.Update
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
-	list, err = handler.ProductService.List()
+	list, err := handler.ProductService.List()
 	if err != nil {
 		if admin != update.Message.Chat.ID {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
@@ -62,6 +63,25 @@ func (handler *ProductHandler) HandleCatalogName(ctx *th.Context, update telego.
 	if err != nil {
 		return err
 	}
+	if update.Message.Text == "Добавить товар" {
+		if admin != update.Message.Chat.ID {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return errors.New("Want to add product!")
+		}
+	}
+	catalog, err := handler.ProductService.List()
+	if admin != update.Message.Chat.ID {
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		for product := range catalog {
+			if product != update.Message.Text {
+				SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+				return errors.New("Product Not Found")
+			}
+		}
+	}
 	err = handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
@@ -83,7 +103,7 @@ func (handler *ProductHandler) HandleCatalogWeight(ctx *th.Context, update teleg
 	}
 	product, err := handler.FSMService.ProductCatalogWeight(update.Message.Chat.ID, weight)
 	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
 	text := fmt.Sprintf("Название: %s\n\nОписание: %s\n\nВес: %d\nЦена: %d", product.Name, product.Description, product.Weight, product.Price)
