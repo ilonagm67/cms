@@ -16,12 +16,11 @@ func NewUserRepository() *UserRepository {
 }
 
 func (repo *UserRepository) Add(ID int64, User *entity.User) error {
-	repo.users[ID] = User
-	_, ok := repo.users[ID]
-	if ok {
-		return nil
+	if User.ID == 0 {
+		return errors.New("User Not Found")
 	}
-	return errors.New("User Not Found")
+	repo.users[ID] = User
+	return nil
 }
 
 func (repo *UserRepository) Delete(ID int64) error {
