@@ -1,4 +1,4 @@
-package telegram
+package telegohandlers
 
 import (
 	"github.com/mymmrac/telego"

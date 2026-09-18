@@ -1,4 +1,4 @@
-package telegram
+package telegohandlers
 
 import (
 	"cms/internal/service"
@@ -24,18 +24,51 @@ func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) 
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
+	list, _ := handler.ProductService.List()
+	for Product := range list {
+		err := SendMessage(ctx, update.Message.Chat.ID, Product, nil)
+		if err != nil {
+			return err
+		}
+	}
 	SendMessage(ctx, update.Message.Chat.ID, "Выберите Продукты:", nil)
 	return nil
 }
 
 func (handler *OrderHandler) HandleOrderProducts(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
-	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-		return err
+	switch update.Message.Text {
+	case "Продолжить":
+		err := handler.FSMService.ProcessOrderProductsToDelivery(update.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите Доставку:", DeliveryKeyboard)
+		return nil
+	default:
+		err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		list, err := handler.ProductService.List()
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		for _, Weights := range list {
+			for Weight, Product := range Weights {
+				if Product.Name == update.Message.Text {
+					weight := strconv.Itoa(Weight)
+					err := SendMessage(ctx, update.Message.Chat.ID, weight, nil)
+					if err != nil {
+						return err
+					}
+				}
+			}
+		}
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите Вес:", nil)
+		return nil
 	}
-	SendMessage(ctx, update.Message.Chat.ID, "Выберите Вес:", nil)
-	return nil
 }
 
 func (handler *OrderHandler) HandleOrderProductsWeight(ctx *th.Context, update telego.Update) error {
@@ -49,7 +82,7 @@ func (handler *OrderHandler) HandleOrderProductsWeight(ctx *th.Context, update t
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
-	SendMessage(ctx, update.Message.Chat.ID, "Выберите Количество:", nil)
+	SendMessage(ctx, update.Message.Chat.ID, "Введите Количество:", nil)
 	return nil
 }
 
@@ -64,7 +97,7 @@ func (handler *OrderHandler) HandleOrderProductsCount(ctx *th.Context, update te
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
-	SendMessage(ctx, update.Message.Chat.ID, "Выберите Доставку:", DeliveryKeyboard)
+	SendMessage(ctx, update.Message.Chat.ID, "Выберите способ доставки:", DeliveryKeyboard)
 	return nil
 }
 

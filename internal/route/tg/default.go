@@ -1,7 +1,7 @@
 package tg
 
 import (
-	"cms/internal/handler/telegram"
+	"cms/internal/handler/telegohandlers"
 	"context"
 	"log"
 	"os"
@@ -12,12 +12,12 @@ import (
 
 type Router struct {
 	Bot            *telego.Bot
-	OrderHandler   *telegram.OrderHandler
-	ProductHandler *telegram.ProductHandler
-	UserHandler    *telegram.UserHandler
+	OrderHandler   *telegohandlers.OrderHandler
+	ProductHandler *telegohandlers.ProductHandler
+	UserHandler    *telegohandlers.UserHandler
 }
 
-func NewRouter(Oh *telegram.OrderHandler, Ph *telegram.ProductHandler, Uh *telegram.UserHandler) *Router {
+func NewRouter(Oh *telegohandlers.OrderHandler, Ph *telegohandlers.ProductHandler, Uh *telegohandlers.UserHandler) *Router {
 	token := os.Getenv("TOKEN")
 	if token == "" {
 		log.Fatal("env TOKEN not found")

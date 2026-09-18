@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cms/internal/handler/telegram"
+	"cms/internal/handler/telegohandlers"
 	"cms/internal/handler/web"
 	"cms/internal/repository/memory"
 	"cms/internal/route/http"
@@ -24,9 +24,9 @@ func main() {
 	webproducthandler := web.NewProductHandler(productservice)
 	webuserhandler := web.NewUserHandler(userservice)
 
-	tgorderhandler := telegram.NewOrderHandler(fsmservice, productservice)
-	tgproducthandler := telegram.NewProductHandler(fsmservice, productservice, userservice)
-	tguserhandler := telegram.NewUserHandler(fsmservice, userservice)
+	tgorderhandler := telegohandlers.NewOrderHandler(fsmservice, productservice)
+	tgproducthandler := telegohandlers.NewProductHandler(fsmservice, productservice)
+	tguserhandler := telegohandlers.NewUserHandler(fsmservice, userservice)
 
 	httproute := http.NewRouter(weborderhandler, webproducthandler, webuserhandler)
 	tgroute := tg.NewRouter(tgorderhandler, tgproducthandler, tguserhandler)
