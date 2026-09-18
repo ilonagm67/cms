@@ -75,7 +75,7 @@ func (Service *FSMService) ProcessOrderProductsCount(id int64, count int) error 
 		Service.FSMRepo.Set(id, "")
 		return err
 	}
-	err = Service.FSMRepo.Set(id, "order_delivery")
+	err = Service.FSMRepo.Set(id, "order_pre_delivery")
 	if err != nil {
 		Service.FSMRepo.Set(id, "")
 		return err
@@ -83,9 +83,14 @@ func (Service *FSMService) ProcessOrderProductsCount(id int64, count int) error 
 	return nil
 }
 
-func (Service *FSMService) ProcessOrderProductsToDelivery(id int64) error {
-	err := Service.FSMRepo.Set(id, "order_delivery")
-	return err
+func (Service *FSMService) ProcessOrderPreDelivery(id int64, text string) error {
+	switch text {
+	case "Добавить товар:":
+	case "Удалить товар":
+	case "Оформить доставку":
+	default:
+	}
+	return nil
 }
 
 func (Service *FSMService) ProcessOrderDelivery(id int64, text string) error {

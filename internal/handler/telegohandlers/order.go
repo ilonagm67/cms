@@ -37,13 +37,6 @@ func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) 
 
 func (handler *OrderHandler) HandleOrderProducts(ctx *th.Context, update telego.Update) error {
 	switch update.Message.Text {
-	case "Продолжить":
-		err := handler.FSMService.ProcessOrderProductsToDelivery(update.Message.Chat.ID)
-		if err != nil {
-			return err
-		}
-		SendMessage(ctx, update.Message.Chat.ID, "Выберите Доставку:", DeliveryKeyboard)
-		return nil
 	default:
 		err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
@@ -97,7 +90,40 @@ func (handler *OrderHandler) HandleOrderProductsCount(ctx *th.Context, update te
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
-	SendMessage(ctx, update.Message.Chat.ID, "Выберите способ доставки:", DeliveryKeyboard)
+	SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию:", nil)
+	return nil
+}
+
+func (handler *OrderHandler) HandleOrderPreDelivery(ctx *th.Context, update telego.Update) error {
+	switch update.Message.Text {
+	case "Добавить товар:":
+		err := handler.FSMService.OrderStart(update.Message.Chat.ID)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите товар:", MainKeyboard)
+		return nil
+	case "Удалить товар":
+		err := handler.FSMService.ProcessOrderPreDelivery(update.Message.Chat.ID, update.Message.Text)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите товар:", MainKeyboard)
+		return nil
+	case "Оформить доставку":
+		err := handler.FSMService.ProcessOrderPreDelivery(update.Message.Chat.ID, update.Message.Text)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите тип доставки:", nil)
+		return nil
+	default:
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию!", nil)
+		return nil
+	}
 	return nil
 }
 
