@@ -65,6 +65,7 @@ func (handler *ProductHandler) HandleCatalogName(ctx *th.Context, update telego.
 	switch update.Message.Text {
 	case "Добавить товар":
 		if admin != update.Message.Chat.ID {
+			handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return errors.New("Want to add product!")
 		} else {
@@ -75,6 +76,7 @@ func (handler *ProductHandler) HandleCatalogName(ctx *th.Context, update telego.
 	default:
 		err := handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
+			handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
@@ -103,17 +105,19 @@ func (handler *ProductHandler) HandleCatalogWeight(ctx *th.Context, update teleg
 	}
 	product, err := handler.FSMService.ProductCatalogWeight(update.Message.Chat.ID, weight)
 	if err != nil {
+		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
 	text := fmt.Sprintf("Название: %s\n\nОписание: %s\n\nВес: %d\nЦена: %d", product.Name, product.Description, product.Weight, product.Price)
-	SendMessage(ctx, update.Message.Chat.ID, text, MainKeyboard)
+	SendMessagePhoto(ctx, update.Message.Chat.ID, text, product.Image, MainKeyboard)
 	return nil
 }
 
 func (handler *ProductHandler) HandleCatalogAddName(ctx *th.Context, update telego.Update) error {
 	err := handler.FSMService.ProductAddingName(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
+		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
@@ -129,6 +133,7 @@ func (handler *ProductHandler) HandleCatalogAddWeight(ctx *th.Context, update te
 	}
 	err = handler.FSMService.ProductAddingWeight(update.Message.Chat.ID, weight)
 	if err != nil {
+		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
@@ -139,20 +144,38 @@ func (handler *ProductHandler) HandleCatalogAddWeight(ctx *th.Context, update te
 func (handler *ProductHandler) HandleCatalogAddDescription(ctx *th.Context, update telego.Update) error {
 	err := handler.FSMService.ProductAddingDescription(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
+		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
-	SendMessage(ctx, update.Message.Chat.ID, "Назовите Изображение:", nil)
+	SendMessage(ctx, update.Message.Chat.ID, "Отправьте изображение:", nil)
 	return nil
 }
 
 func (handler *ProductHandler) HandleCatalogAddImage(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.ProductAddingImage(update.Message.Chat.ID, update.Message.Text)
-	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-		return err
+	switch {
+	case len(update.Message.Photo) > 0:
+		for num, photo := range update.Message.Photo {
+			if num == 3 {
+				file, err := DownloadImage(ctx, "photo", photo.FileID, photo.FileUniqueID)
+				if err != nil {
+					handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
+					SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+					return err
+				}
+				err = handler.FSMService.ProductAddingImage(update.Message.Chat.ID, file)
+				if err != nil {
+					handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
+					SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+					return err
+				}
+			}
+		}
+		SendMessage(ctx, update.Message.Chat.ID, "Введите цену:", nil)
+		return nil
+	default:
+		SendMessage(ctx, update.Message.Chat.ID, "Отправьте Изображение!", nil)
 	}
-	SendMessage(ctx, update.Message.Chat.ID, "Введите цену:", nil)
 	return nil
 }
 
@@ -164,6 +187,7 @@ func (handler *ProductHandler) HandleCatalogAddPrice(ctx *th.Context, update tel
 	}
 	err = handler.FSMService.ProductAddingPrice(update.Message.Chat.ID, price)
 	if err != nil {
+		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}

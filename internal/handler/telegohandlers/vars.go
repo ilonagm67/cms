@@ -1,6 +1,11 @@
 package telegohandlers
 
 import (
+	"io"
+	"net/http"
+	"os"
+	"path"
+
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
 	tu "github.com/mymmrac/telego/telegoutil"
@@ -63,6 +68,19 @@ var ReturnKeyboard = tu.Keyboard(
 	),
 ).WithOneTimeKeyboard()
 
+func SendMessagePhoto(ctx *th.Context, ID int64, text string, photo string, keyboard telego.ReplyMarkup) error {
+	_, err := ctx.Bot().SendPhoto(ctx, tu.Photo(
+		tu.ID(ID),
+		tu.File(OpenPhoto(photo)),
+	).WithCaption(text).WithReplyMarkup(keyboard))
+	return err
+}
+
+func OpenPhoto(photo string) *os.File {
+	file, _ := os.Open(photo)
+	return file
+}
+
 func SendMessage(ctx *th.Context, ID int64, text string, keyboard telego.ReplyMarkup) error {
 	if keyboard != nil {
 		_, err := ctx.Bot().SendMessage(ctx, tu.Message(
@@ -77,4 +95,35 @@ func SendMessage(ctx *th.Context, ID int64, text string, keyboard telego.ReplyMa
 		))
 		return err
 	}
+}
+
+func DownloadImage(ctx *th.Context, Folder, ID, Unique string) (string, error) {
+	file, err := ctx.Bot().GetFile(ctx, &telego.GetFileParams{
+		FileID: ID,
+	})
+	if err != nil {
+		return "", err
+	}
+	URL := ctx.Bot().FileDownloadURL(file.FilePath)
+	resp, err := http.Get(URL)
+	if err != nil {
+		return "", err
+	}
+	_, err = os.ReadDir(Folder)
+	if err != nil {
+		err = os.Mkdir(Folder, 0755)
+		if err != nil {
+			return "", err
+		}
+	}
+	filepath := path.Join(Folder, Unique+".jpg")
+	out, err := os.Create(filepath)
+	if err != nil {
+		return "", err
+	}
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return filepath, nil
 }
