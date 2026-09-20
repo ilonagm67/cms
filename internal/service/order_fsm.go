@@ -24,38 +24,40 @@ func (Service *FSMService) OrderStart(id int64) error {
 }
 
 func (Service *FSMService) ProcessOrderProducts(id int64, text string) error {
-	order, err := Service.OrderRepo.Get(id)
+	fsm, err := Service.FSMRepo.GetData(id)
 	if err != nil {
 		Service.FSMRepo.Set(id, "")
 		return err
 	}
-	order.Products.Name = text
-	err = Service.OrderRepo.Add(id, order)
-	if err != nil {
-		Service.FSMRepo.Set(id, "")
-		return err
-	}
-	err = Service.FSMRepo.Set(id, "order_products_weight")
-	if err != nil {
-		Service.FSMRepo.Set(id, "")
-		return err
-	}
+	fsm.DataName = text
+	fsm.State = "order_products_weight"
+	Service.FSMRepo.SetData(id, fsm)
 	return nil
 }
 
 func (Service *FSMService) ProcessOrderProductsWeight(id int64, weight int) error {
+	fsm, err := Service.FSMRepo.GetData(id)
+	if err != nil {
+		return err
+	}
+	fsm.DataWeight = weight
+	product, _ := Service.ProductRepo.Get(fsm.DataName, fsm.DataWeight)
 	order, err := Service.OrderRepo.Get(id)
 	if err != nil {
-		Service.FSMRepo.Set(id, "")
-		return err
+		productmap := make(map[string]map[int]*entity.Product)
+		_, exists := productmap[product.Name]
+		if !exists {
+			productmap[product.Name] = make(map[int]*entity.Product)
+		}
+		productmap[product.Name][product.Weight] = product
 	}
-	order.Products.Weight = weight
-	err = Service.OrderRepo.Add(id, order)
+	err = Service.OrderRepo.Add(id, &entity.Order{UserID: id, Products: productmap})
 	if err != nil {
 		Service.FSMRepo.Set(id, "")
 		return err
 	}
-	Service.FSMRepo.Set(id, "order_products_count")
+	fsm.State = "order_products_count"
+	err = Service.FSMRepo.SetData(id, fsm)
 	if err != nil {
 		Service.FSMRepo.Set(id, "")
 		return err
@@ -64,12 +66,16 @@ func (Service *FSMService) ProcessOrderProductsWeight(id int64, weight int) erro
 }
 
 func (Service *FSMService) ProcessOrderProductsCount(id int64, count int) error {
+	fsm, err := Service.FSMRepo.GetData(id)
+	if err != nil {
+		return err
+	}
 	order, err := Service.OrderRepo.Get(id)
 	if err != nil {
 		Service.FSMRepo.Set(id, "")
 		return err
 	}
-	order.Products.Count = count
+	order.Products[fsm.DataName][fsm.DataWeight].Count = count
 	err = Service.OrderRepo.Add(id, order)
 	if err != nil {
 		Service.FSMRepo.Set(id, "")
@@ -85,7 +91,13 @@ func (Service *FSMService) ProcessOrderProductsCount(id int64, count int) error 
 
 func (Service *FSMService) ProcessOrderPreDelivery(id int64, text string) error {
 	switch text {
-	case "Добавить товар:":
+	case "Добавить товар":
+		err := Service.FSMRepo.Set(id, "order_products")
+		if err != nil {
+			Service.FSMRepo.Set(id, "")
+			return err
+		}
+		return nil
 	case "Удалить товар":
 	case "Оформить доставку":
 	default:

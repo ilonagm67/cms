@@ -11,11 +11,12 @@ import (
 
 type OrderHandler struct {
 	FSMService     *service.FSMService
+	OrderService   *service.OrderService
 	ProductService *service.ProductService
 }
 
-func NewOrderHandler(FSMService *service.FSMService, ProductService *service.ProductService) *OrderHandler {
-	return &OrderHandler{FSMService: FSMService, ProductService: ProductService}
+func NewOrderHandler(FSMService *service.FSMService, ProductService *service.ProductService, OrderService *service.OrderService) *OrderHandler {
+	return &OrderHandler{FSMService: FSMService, ProductService: ProductService, OrderService: OrderService}
 }
 
 func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) error {
@@ -36,32 +37,29 @@ func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) 
 }
 
 func (handler *OrderHandler) HandleOrderProducts(ctx *th.Context, update telego.Update) error {
-	switch update.Message.Text {
-	default:
-		err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
-		if err != nil {
-			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-			return err
-		}
-		list, err := handler.ProductService.List()
-		if err != nil {
-			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-			return err
-		}
-		for _, Weights := range list {
-			for Weight, Product := range Weights {
-				if Product.Name == update.Message.Text {
-					weight := strconv.Itoa(Weight)
-					err := SendMessage(ctx, update.Message.Chat.ID, weight, nil)
-					if err != nil {
-						return err
-					}
+	err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
+	if err != nil {
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+		return err
+	}
+	list, err := handler.ProductService.List()
+	if err != nil {
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+		return err
+	}
+	for _, Weights := range list {
+		for Weight, Product := range Weights {
+			if Product.Name == update.Message.Text {
+				weight := strconv.Itoa(Weight)
+				err := SendMessage(ctx, update.Message.Chat.ID, weight, nil)
+				if err != nil {
+					return err
 				}
 			}
 		}
-		SendMessage(ctx, update.Message.Chat.ID, "Выберите Вес:", nil)
-		return nil
 	}
+	SendMessage(ctx, update.Message.Chat.ID, "Выберите Вес:", nil)
+	return nil
 }
 
 func (handler *OrderHandler) HandleOrderProductsWeight(ctx *th.Context, update telego.Update) error {
@@ -90,36 +88,35 @@ func (handler *OrderHandler) HandleOrderProductsCount(ctx *th.Context, update te
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
-	SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию:", nil)
+	products, err := handler.OrderService.String(update.Message.Chat.ID)
+	if err != nil {
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+		return err
+	}
+	SendMessage(ctx, update.Message.Chat.ID, products, nil)
+	SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию:", PreDeliveryKeyboard)
 	return nil
 }
 
 func (handler *OrderHandler) HandleOrderPreDelivery(ctx *th.Context, update telego.Update) error {
 	switch update.Message.Text {
-	case "Добавить товар:":
-		err := handler.FSMService.OrderStart(update.Message.Chat.ID)
+	case "Добавить товар":
+		err := handler.FSMService.ProcessOrderPreDelivery(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
-		SendMessage(ctx, update.Message.Chat.ID, "Выберите товар:", MainKeyboard)
+		list, _ := handler.ProductService.List()
+		for Product := range list {
+			err = SendMessage(ctx, update.Message.Chat.ID, Product, nil)
+			if err != nil {
+				return err
+			}
+		}
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите товар:", nil)
 		return nil
 	case "Удалить товар":
-		err := handler.FSMService.ProcessOrderPreDelivery(update.Message.Chat.ID, update.Message.Text)
-		if err != nil {
-			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-			return err
-		}
-		SendMessage(ctx, update.Message.Chat.ID, "Выберите товар:", MainKeyboard)
-		return nil
 	case "Оформить доставку":
-		err := handler.FSMService.ProcessOrderPreDelivery(update.Message.Chat.ID, update.Message.Text)
-		if err != nil {
-			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-			return err
-		}
-		SendMessage(ctx, update.Message.Chat.ID, "Выберите тип доставки:", nil)
-		return nil
 	default:
 		SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию!", nil)
 		return nil

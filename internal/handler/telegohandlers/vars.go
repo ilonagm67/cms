@@ -38,6 +38,18 @@ var AdminCatalogKeyboard = tu.Keyboard(
 	),
 ).WithOneTimeKeyboard().WithResizeKeyboard()
 
+var PreDeliveryKeyboard = tu.Keyboard(
+	tu.KeyboardRow(
+		tu.KeyboardButton("Добавить товар"),
+	),
+	tu.KeyboardRow(
+		tu.KeyboardButton("Удалить товар"),
+	),
+	tu.KeyboardRow(
+		tu.KeyboardButton("Оформить доставку"),
+	),
+).WithOneTimeKeyboard().WithResizeKeyboard()
+
 var DeliveryKeyboard = tu.Keyboard(
 	tu.KeyboardRow(
 		tu.KeyboardButton("Новая Почта"),

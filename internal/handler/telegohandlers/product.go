@@ -156,7 +156,7 @@ func (handler *ProductHandler) HandleCatalogAddImage(ctx *th.Context, update tel
 	switch {
 	case len(update.Message.Photo) > 0:
 		for num, photo := range update.Message.Photo {
-			if num == 3 {
+			if num == 2 {
 				file, err := DownloadImage(ctx, "photo", photo.FileID, photo.FileUniqueID)
 				if err != nil {
 					handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
