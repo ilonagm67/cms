@@ -42,15 +42,12 @@ func (Service *FSMService) ProcessOrderProductsWeight(id int64, weight int) erro
 	}
 	fsm.DataWeight = weight
 	product, _ := Service.ProductRepo.Get(fsm.DataName, fsm.DataWeight)
-	order, err := Service.OrderRepo.Get(id)
-	if err != nil {
-		productmap := make(map[string]map[int]*entity.Product)
-		_, exists := productmap[product.Name]
-		if !exists {
-			productmap[product.Name] = make(map[int]*entity.Product)
-		}
-		productmap[product.Name][product.Weight] = product
+	productmap := make(map[string]map[int]*entity.Product)
+	_, exists := productmap[product.Name]
+	if !exists {
+		productmap[product.Name] = make(map[int]*entity.Product)
 	}
+	productmap[product.Name][product.Weight] = product
 	err = Service.OrderRepo.Add(id, &entity.Order{UserID: id, Products: productmap})
 	if err != nil {
 		Service.FSMRepo.Set(id, "")
