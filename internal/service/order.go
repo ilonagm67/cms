@@ -31,9 +31,13 @@ func (Service *OrderService) List() (map[int64]*entity.Order, error) {
 }
 
 func (Service *OrderService) String(id int64) (string, error) {
-	_, err := Service.OrderRepo.Get(id)
+	var cart string
+	order, err := Service.OrderRepo.Get(id)
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("Ваш заказ:"), nil
+	for product := range order.Products {
+		cart += fmt.Sprintf("%s\n", product)
+	}
+	return fmt.Sprintf("Ваш заказ:\n\n%s", cart), nil
 }

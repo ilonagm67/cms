@@ -2,6 +2,7 @@ package service
 
 import (
 	"cms/internal/entity"
+	"errors"
 )
 
 func (Service *FSMService) OrderStart(id int64) error {
@@ -36,22 +37,38 @@ func (Service *FSMService) ProcessOrderProducts(id int64, text string) error {
 }
 
 func (Service *FSMService) ProcessOrderProductsWeight(id int64, weight int) error {
+	var productmap map[string]map[int]*entity.Product
 	fsm, err := Service.FSMRepo.GetData(id)
 	if err != nil {
 		return err
 	}
 	fsm.DataWeight = weight
 	product, _ := Service.ProductRepo.Get(fsm.DataName, fsm.DataWeight)
-	productmap := make(map[string]map[int]*entity.Product)
-	_, exists := productmap[product.Name]
-	if !exists {
-		productmap[product.Name] = make(map[int]*entity.Product)
-	}
-	productmap[product.Name][product.Weight] = product
-	err = Service.OrderRepo.Add(id, &entity.Order{UserID: id, Products: productmap})
-	if err != nil {
-		Service.FSMRepo.Set(id, "")
-		return err
+	order, _ := Service.OrderRepo.Get(id)
+	if order.Products == nil {
+		productmap = make(map[string]map[int]*entity.Product, 0)
+		_, exists := productmap[product.Name]
+		if !exists {
+			productmap[product.Name] = make(map[int]*entity.Product)
+		}
+		productmap[product.Name][product.Weight] = product
+		err = Service.OrderRepo.Add(id, &entity.Order{UserID: id, Products: productmap})
+		if err != nil {
+			Service.FSMRepo.Set(id, "")
+			return err
+		}
+	} else {
+		productmap = order.Products
+		_, exists := productmap[product.Name]
+		if !exists {
+			productmap[product.Name] = make(map[int]*entity.Product)
+		}
+		productmap[product.Name][product.Weight] = product
+		err = Service.OrderRepo.Add(id, &entity.Order{UserID: id, Products: productmap})
+		if err != nil {
+			Service.FSMRepo.Set(id, "")
+			return err
+		}
 	}
 	fsm.State = "order_products_count"
 	err = Service.FSMRepo.SetData(id, fsm)
@@ -86,6 +103,21 @@ func (Service *FSMService) ProcessOrderProductsCount(id int64, count int) error 
 	return nil
 }
 
+func (Service *FSMService) ProcessOrderProductsDeleteName(id int64, text string) error {
+	order, _ := Service.OrderRepo.Get(id)
+	_, ok := order.Products[text]
+	if ok {
+		delete(order.Products, text)
+		err := Service.FSMRepo.Set(id, "order_pre_delivery")
+		if err != nil {
+			Service.FSMRepo.Set(id, "")
+			return err
+		}
+		return nil
+	}
+	return errors.New("Product not found")
+}
+
 func (Service *FSMService) ProcessOrderPreDelivery(id int64, text string) error {
 	switch text {
 	case "Добавить товар":
@@ -96,8 +128,19 @@ func (Service *FSMService) ProcessOrderPreDelivery(id int64, text string) error 
 		}
 		return nil
 	case "Удалить товар":
+		err := Service.FSMRepo.Set(id, "order_products_delete_name")
+		if err != nil {
+			Service.FSMRepo.Set(id, "")
+			return err
+		}
 	case "Оформить доставку":
+		err := Service.FSMRepo.Set(id, "order_delivery")
+		if err != nil {
+			Service.FSMRepo.Set(id, "")
+			return err
+		}
 	default:
+		return errors.New("Text not found!")
 	}
 	return nil
 }
