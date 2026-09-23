@@ -3,6 +3,7 @@ package service
 import (
 	"cms/internal/entity"
 	"errors"
+	"fmt"
 )
 
 func (Service *FSMService) OrderStart(id int64) error {
@@ -32,12 +33,13 @@ func (Service *FSMService) ProcessOrderProducts(id int64, text string) error {
 		return err
 	}
 	for ProductName := range list {
-		if ProductName != text {
-			return errors.New("Product not found!")
+		if ProductName == text {
+			Service.FSMRepo.Set(id, "order_products_weight")
+			return nil
 		}
 	}
-	Service.FSMRepo.Set(id, "order_products_weight")
-	return nil
+	Service.FSMRepo.Delete(id)
+	return fmt.Errorf("Product not Found: %s", text)
 }
 
 func (Service *FSMService) ProcessOrderProductsWeight(id int64, weight int) error {

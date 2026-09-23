@@ -3,6 +3,7 @@ package memory
 import (
 	"cms/internal/entity"
 	"errors"
+	"fmt"
 )
 
 type ProductRepository struct {
@@ -30,7 +31,7 @@ func (repo *ProductRepository) Delete(Name string) error {
 		delete(repo.products, Name)
 		return nil
 	}
-	return errors.New("Product Not Found")
+	return fmt.Errorf("Product Not Found: %s", Name)
 }
 
 func (repo *ProductRepository) Get(Name string, Weight int) (*entity.Product, error) {
@@ -38,7 +39,7 @@ func (repo *ProductRepository) Get(Name string, Weight int) (*entity.Product, er
 	if ok {
 		return i, nil
 	}
-	return nil, errors.New("Product Not Found")
+	return nil, fmt.Errorf("Product Not Found, Name: %s, Weight: %d", Name, Weight)
 }
 
 func (repo *ProductRepository) List() (map[string]map[int]*entity.Product, error) {

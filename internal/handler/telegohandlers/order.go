@@ -8,6 +8,7 @@ import (
 
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
+	tu "github.com/mymmrac/telego/telegoutil"
 )
 
 type OrderHandler struct {
@@ -26,14 +27,23 @@ func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) 
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
+	var rows [][]telego.KeyboardButton
+	var row []telego.KeyboardButton
+	count := 0
 	list, _ := handler.ProductService.List()
 	for Product := range list {
-		err := SendMessage(ctx, update.Message.Chat.ID, Product, nil)
-		if err != nil {
-			return err
+		row = append(row, tu.KeyboardButton(Product))
+		count++
+		if count%2 == 0 {
+			rows = append(rows, row)
+			row = nil
 		}
 	}
-	SendMessage(ctx, update.Message.Chat.ID, "Выберите Продукты:", nil)
+	if len(row) > 0 {
+		rows = append(rows, row)
+	}
+	keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
+	SendMessage(ctx, update.Message.Chat.ID, "Выберите Продукты:", keyboard)
 	return nil
 }
 
@@ -43,19 +53,29 @@ func (handler *OrderHandler) HandleOrderProducts(ctx *th.Context, update telego.
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
+	var rows [][]telego.KeyboardButton
+	var row []telego.KeyboardButton
+	count := 0
 	list, _ := handler.ProductService.List()
 	for _, Weights := range list {
 		for _, Product := range Weights {
 			if Product.Name == update.Message.Text {
+				weight := strconv.Itoa(Product.Weight)
 				text := fmt.Sprintf("%dкг - %dгрн.", Product.Weight, Product.Price)
-				err := SendMessage(ctx, update.Message.Chat.ID, text, nil)
+				err = SendMessage(ctx, update.Message.Chat.ID, text, nil)
 				if err != nil {
 					return err
 				}
+				row = append(row, tu.KeyboardButton(weight))
+				count++
 			}
 		}
 	}
-	SendMessage(ctx, update.Message.Chat.ID, "Выберите Вес:", nil)
+	if len(row) > 0 {
+		rows = append(rows, row)
+	}
+	keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
+	SendMessage(ctx, update.Message.Chat.ID, "Выберите Вес:", keyboard)
 	return nil
 }
 
@@ -106,19 +126,33 @@ func (handler *OrderHandler) HandleOrderProductsDeleteName(ctx *th.Context, upda
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
+	var rows [][]telego.KeyboardButton
+	var row []telego.KeyboardButton
+	count := 0
 	for _, Weights := range order.Products {
-		for _, product := range Weights {
+		for Weight, product := range Weights {
 			if product.Name == update.Message.Text {
+				weight := strconv.Itoa(Weight)
 				total := product.Price * product.Count
 				text := fmt.Sprintf("%d кг - %d.грн", product.Weight, total)
 				err := SendMessage(ctx, update.Message.Chat.ID, text, nil)
 				if err != nil {
 					return err
 				}
+				row = append(row, tu.KeyboardButton(weight))
+				count++
+				if count%2 == 0 {
+					rows = append(rows, row)
+					row = nil
+				}
 			}
 		}
 	}
-	SendMessage(ctx, update.Message.Chat.ID, "Выберите вес:", nil)
+	if len(row) > 0 {
+		rows = append(rows, row)
+	}
+	keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
+	SendMessage(ctx, update.Message.Chat.ID, "Выберите вес:", keyboard)
 	return nil
 }
 
@@ -152,14 +186,23 @@ func (handler *OrderHandler) HandleOrderPreDelivery(ctx *th.Context, update tele
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
+		var rows [][]telego.KeyboardButton
+		var row []telego.KeyboardButton
+		count := 0
 		list, _ := handler.ProductService.List()
 		for Product := range list {
-			err = SendMessage(ctx, update.Message.Chat.ID, Product, nil)
-			if err != nil {
-				return err
+			row = append(row, tu.KeyboardButton(Product))
+			count++
+			if count%2 == 0 {
+				rows = append(rows, row)
+				row = nil
 			}
 		}
-		SendMessage(ctx, update.Message.Chat.ID, "Выберите товар:", nil)
+		if len(row) > 0 {
+			rows = append(rows, row)
+		}
+		keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите товар:", keyboard)
 		return nil
 	case "Удалить товар":
 		err := handler.FSMService.ProcessOrderPreDelivery(update.Message.Chat.ID, update.Message.Text)
@@ -172,13 +215,22 @@ func (handler *OrderHandler) HandleOrderPreDelivery(ctx *th.Context, update tele
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
+		var rows [][]telego.KeyboardButton
+		var row []telego.KeyboardButton
+		count := 0
 		for Product := range order.Products {
 			err = SendMessage(ctx, update.Message.Chat.ID, Product, nil)
 			if err != nil {
 				return err
 			}
+			row = append(row, tu.KeyboardButton(Product))
+			count++
 		}
-		SendMessage(ctx, update.Message.Chat.ID, "Выберите товар:", nil)
+		if len(row) > 0 {
+			rows = append(rows, row)
+		}
+		keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите товар:", keyboard)
 		return nil
 	case "Оформить доставку":
 		order, _ := handler.OrderService.Get(update.Message.Chat.ID)

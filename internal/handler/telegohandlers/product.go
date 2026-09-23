@@ -9,6 +9,7 @@ import (
 
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
+	tu "github.com/mymmrac/telego/telegoutil"
 )
 
 type ProductHandler struct {
@@ -26,18 +27,30 @@ func (handler *ProductHandler) HandleStart(ctx *th.Context, update telego.Update
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
+	var rows [][]telego.KeyboardButton
+	var row []telego.KeyboardButton
+	count := 0
 	list, _ := handler.ProductService.List()
 	for Product := range list {
-		err = SendMessage(ctx, update.Message.Chat.ID, Product, nil)
-		if err != nil {
-			return err
+		row = append(row, tu.KeyboardButton(Product))
+		count++
+		if count%2 == 0 {
+			rows = append(rows, row)
+			row = nil
 		}
 	}
+	if len(row) > 0 {
+		rows = append(rows, row)
+	}
 	if !admin {
-		SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию:", nil)
+		keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию:", keyboard)
 		return err
 	} else {
-		SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию:", AdminCatalogKeyboard)
+		row = tu.KeyboardRow(tu.KeyboardButton("Добавить товар"))
+		rows = append(rows, row)
+		keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию:", keyboard)
 		return nil
 	}
 }
@@ -64,19 +77,33 @@ func (handler *ProductHandler) HandleCatalogName(ctx *th.Context, update telego.
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
+		var rows [][]telego.KeyboardButton
+		var row []telego.KeyboardButton
+		count := 0
 		list, _ := handler.ProductService.List()
 		for _, Weights := range list {
 			for Weight, Product := range Weights {
 				if Product.Name == update.Message.Text {
 					weight := strconv.Itoa(Weight)
-					err := SendMessage(ctx, update.Message.Chat.ID, weight, nil)
+					text := fmt.Sprintf("%dкг", Product.Weight)
+					err := SendMessage(ctx, update.Message.Chat.ID, text, nil)
 					if err != nil {
 						return err
+					}
+					row = append(row, tu.KeyboardButton(weight))
+					count++
+					if count%2 == 0 {
+						rows = append(rows, row)
+						row = nil
 					}
 				}
 			}
 		}
-		SendMessage(ctx, update.Message.Chat.ID, "Выберите вес:", nil)
+		if len(row) > 0 {
+			rows = append(rows, row)
+		}
+		keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите вес:", keyboard)
 		return nil
 	}
 }
