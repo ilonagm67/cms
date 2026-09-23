@@ -3,6 +3,7 @@ package telegohandlers
 import (
 	"cms/internal/service"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/mymmrac/telego"
@@ -22,7 +23,6 @@ func NewOrderHandler(FSMService *service.FSMService, ProductService *service.Pro
 func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) error {
 	err := handler.FSMService.OrderStart(update.Message.Chat.ID)
 	if err != nil {
-		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
@@ -40,21 +40,15 @@ func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) 
 func (handler *OrderHandler) HandleOrderProducts(ctx *th.Context, update telego.Update) error {
 	err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
-	list, err := handler.ProductService.List()
-	if err != nil {
-		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-		return err
-	}
+	list, _ := handler.ProductService.List()
 	for _, Weights := range list {
-		for Weight, Product := range Weights {
+		for _, Product := range Weights {
 			if Product.Name == update.Message.Text {
-				weight := strconv.Itoa(Weight)
-				err := SendMessage(ctx, update.Message.Chat.ID, weight, nil)
+				text := fmt.Sprintf("%dкг - %dгрн.", Product.Weight, Product.Price)
+				err := SendMessage(ctx, update.Message.Chat.ID, text, nil)
 				if err != nil {
 					return err
 				}
@@ -73,7 +67,6 @@ func (handler *OrderHandler) HandleOrderProductsWeight(ctx *th.Context, update t
 	}
 	err = handler.FSMService.ProcessOrderProductsWeight(update.Message.Chat.ID, weight)
 	if err != nil {
-		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
@@ -89,13 +82,11 @@ func (handler *OrderHandler) HandleOrderProductsCount(ctx *th.Context, update te
 	}
 	err = handler.FSMService.ProcessOrderProductsCount(update.Message.Chat.ID, count)
 	if err != nil {
-		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
 	products, err := handler.OrderService.String(update.Message.Chat.ID)
 	if err != nil {
-		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
@@ -107,14 +98,44 @@ func (handler *OrderHandler) HandleOrderProductsCount(ctx *th.Context, update te
 func (handler *OrderHandler) HandleOrderProductsDeleteName(ctx *th.Context, update telego.Update) error {
 	err := handler.FSMService.ProcessOrderProductsDeleteName(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+		return err
+	}
+	order, err := handler.OrderService.Get(update.Message.Chat.ID)
+	if err != nil {
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+		return err
+	}
+	for _, Weights := range order.Products {
+		for _, product := range Weights {
+			if product.Name == update.Message.Text {
+				total := product.Price * product.Count
+				text := fmt.Sprintf("%d кг - %d.грн", product.Weight, total)
+				err := SendMessage(ctx, update.Message.Chat.ID, text, nil)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	SendMessage(ctx, update.Message.Chat.ID, "Выберите вес:", nil)
+	return nil
+}
+
+func (handler *OrderHandler) HandleOrderProductsDeleteWeight(ctx *th.Context, update telego.Update) error {
+	weight, err := strconv.Atoi(update.Message.Text)
+	if err != nil {
+		SendMessage(ctx, update.Message.Chat.ID, "Введите нормальное число!", nil)
+		return err
+	}
+	err = handler.FSMService.ProcessOrderProductsDeleteWeight(update.Message.Chat.ID, weight)
+	if err != nil {
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
 	SendMessage(ctx, update.Message.Chat.ID, "Товар удалён!", nil)
 	products, err := handler.OrderService.String(update.Message.Chat.ID)
 	if err != nil {
-		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
@@ -128,7 +149,6 @@ func (handler *OrderHandler) HandleOrderPreDelivery(ctx *th.Context, update tele
 	case "Добавить товар":
 		err := handler.FSMService.ProcessOrderPreDelivery(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
@@ -144,12 +164,15 @@ func (handler *OrderHandler) HandleOrderPreDelivery(ctx *th.Context, update tele
 	case "Удалить товар":
 		err := handler.FSMService.ProcessOrderPreDelivery(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
-		list, _ := handler.ProductService.List()
-		for Product := range list {
+		order, err := handler.OrderService.Get(update.Message.Chat.ID)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		for Product := range order.Products {
 			err = SendMessage(ctx, update.Message.Chat.ID, Product, nil)
 			if err != nil {
 				return err
@@ -165,7 +188,6 @@ func (handler *OrderHandler) HandleOrderPreDelivery(ctx *th.Context, update tele
 		}
 		err := handler.FSMService.ProcessOrderPreDelivery(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
@@ -183,28 +205,24 @@ func (handler *OrderHandler) HandleOrderDelivery(ctx *th.Context, update telego.
 	case "Новая Почта":
 		err := handler.FSMService.ProcessOrderDelivery(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
 	case "Укр Почта":
 		err := handler.FSMService.ProcessOrderDelivery(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
 	case "Самовывоз":
 		err := handler.FSMService.ProcessOrderDelivery(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
 	case "Доставка":
 		err := handler.FSMService.ProcessOrderDelivery(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
@@ -221,7 +239,6 @@ func (handler *OrderHandler) HandleOrderPayType(ctx *th.Context, update telego.U
 	case "Перевод на карту":
 		pickup, err := handler.FSMService.ProcessOrderPayType(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
@@ -233,7 +250,6 @@ func (handler *OrderHandler) HandleOrderPayType(ctx *th.Context, update telego.U
 	case "Оплата при получении":
 		pickup, err := handler.FSMService.ProcessOrderPayType(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
-			handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
 		}
@@ -252,7 +268,6 @@ func (handler *OrderHandler) HandleOrderPayType(ctx *th.Context, update telego.U
 func (handler *OrderHandler) HandleOrderAddress(ctx *th.Context, update telego.Update) error {
 	err := handler.FSMService.ProcessOrderAddress(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
-		handler.FSMService.SetCurrentState(update.Message.Chat.ID, "")
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}

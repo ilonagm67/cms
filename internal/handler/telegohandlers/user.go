@@ -21,9 +21,6 @@ func NewUserHandler(FSMService *service.FSMService, UserService *service.UserSer
 
 func (handler *UserHandler) StatePredicate(targetState string) th.Predicate {
 	return func(ctx context.Context, update telego.Update) bool {
-		if update.Message == nil {
-			return false
-		}
 		userID := update.Message.From.ID
 		state, err := handler.FSMService.GetCurrentState(userID)
 		if err != nil {
@@ -34,6 +31,9 @@ func (handler *UserHandler) StatePredicate(targetState string) th.Predicate {
 }
 
 func (handler *UserHandler) Middleware(ctx *th.Context, update telego.Update) error {
+	if update.Message == nil {
+		return nil
+	}
 	if update.Message.Text != "/start" {
 		_, err := handler.UserService.Get(update.Message.Chat.ID)
 		if err != nil {

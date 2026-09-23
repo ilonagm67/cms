@@ -32,12 +32,16 @@ func (Service *OrderService) List() (map[int64]*entity.Order, error) {
 
 func (Service *OrderService) String(id int64) (string, error) {
 	var cart string
+	var Total int
 	order, err := Service.OrderRepo.Get(id)
 	if err != nil {
 		return "", err
 	}
-	for product := range order.Products {
-		cart += fmt.Sprintf("%s\n", product)
+	for _, weights := range order.Products {
+		for _, product := range weights {
+			cart += fmt.Sprintf("Название: %s, Вес: %d, Количество: %d,Цена: %d\n", product.Name, product.Weight, product.Count, product.Price)
+			Total += product.Price * product.Count
+		}
 	}
-	return fmt.Sprintf("Ваш заказ:\n\n%s", cart), nil
+	return fmt.Sprintf("Ваш заказ:\n\n%s\nСумма: %d", cart, Total), nil
 }

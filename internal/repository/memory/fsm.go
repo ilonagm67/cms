@@ -15,26 +15,45 @@ func NewFSMRepository() *FSMRepository {
 	}
 }
 
-func (repo *FSMRepository) Set(ID int64, State entity.State) error {
-	repo.states[ID] = &entity.FSM{UserID: ID, State: State}
+func (repo *FSMRepository) Set(ID int64, State entity.State) {
 	_, ok := repo.states[ID]
-	if ok {
-		return nil
+	if !ok {
+		repo.states[ID] = &entity.FSM{UserID: ID, State: State}
+	} else {
+		repo.states[ID].State = State
 	}
-	return errors.New("FSM not Found")
 }
 
-func (repo *FSMRepository) SetData(ID int64, FSM *entity.FSM) error {
-	repo.states[ID] = FSM
+func (repo *FSMRepository) SetName(ID int64, Name string) error {
+	repo.states[ID].DataName = Name
 	return nil
 }
 
-func (repo *FSMRepository) GetData(ID int64) (*entity.FSM, error) {
+func (repo *FSMRepository) GetName(ID int64) (string, error) {
 	_, ok := repo.states[ID]
-	if ok {
-		return repo.states[ID], nil
+	if !ok {
+		return "", errors.New("Data Not Found")
 	}
-	return nil, errors.New("FSM not Found")
+	if repo.states[ID].DataName == "" {
+		return "", errors.New("DataName is empty")
+	}
+	return repo.states[ID].DataName, nil
+}
+
+func (repo *FSMRepository) SetWeight(ID int64, Weight int) error {
+	repo.states[ID].DataWeight = Weight
+	return nil
+}
+
+func (repo *FSMRepository) GetWeight(ID int64) (int, error) {
+	_, ok := repo.states[ID]
+	if !ok {
+		return 0, errors.New("Data Not Found")
+	}
+	if repo.states[ID].DataWeight == 0 {
+		return 0, errors.New("DataWeight is empty")
+	}
+	return repo.states[ID].DataWeight, nil
 }
 
 func (repo *FSMRepository) Delete(ID int64) error {

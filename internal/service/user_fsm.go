@@ -3,15 +3,12 @@ package service
 import "cms/internal/entity"
 
 func (Service *FSMService) UserQuestionStart(id int64) error {
-	err := Service.FSMRepo.Set(id, "user_question")
-	if err != nil {
-		return err
-	}
+	Service.FSMRepo.Set(id, "user_question")
 	return nil
 }
 
 func (Service *FSMService) UserQuestionProcess(id int64) error {
-	err := Service.FSMRepo.Set(id, "")
+	err := Service.FSMRepo.Delete(id)
 	if err != nil {
 		return err
 	}
@@ -23,10 +20,7 @@ func (Service *FSMService) UserStart(id int64) error {
 	if err != nil {
 		return err
 	}
-	err = Service.FSMRepo.Set(id, "user_name")
-	if err != nil {
-		return err
-	}
+	Service.FSMRepo.Set(id, "user_name")
 	return nil
 }
 
@@ -40,10 +34,7 @@ func (Service *FSMService) UserProcessName(id int64, name string) error {
 	if err != nil {
 		return err
 	}
-	err = Service.FSMRepo.Set(id, "user_phone")
-	if err != nil {
-		return err
-	}
+	Service.FSMRepo.Set(id, "user_phone")
 	return nil
 }
 
@@ -57,7 +48,7 @@ func (Service *FSMService) UserProcessPhone(id int64, number string) error {
 	if err != nil {
 		return err
 	}
-	err = Service.FSMRepo.Set(id, "")
+	err = Service.FSMRepo.Delete(id)
 	if err != nil {
 		return err
 	}
