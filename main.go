@@ -4,6 +4,7 @@ import (
 	"cms/internal/handler/telegohandlers"
 	"cms/internal/handler/web"
 	"cms/internal/repository/memory"
+	"cms/internal/repository/sqlite"
 	"cms/internal/route/http"
 	"cms/internal/route/tg"
 	"cms/internal/service"
@@ -12,8 +13,8 @@ import (
 func main() {
 	fsmrepo := memory.NewFSMRepository()
 	orderrepo := memory.NewOrderRepository()
-	productrepo := memory.NewProductRepository()
-	userrepo := memory.NewUserRepository()
+	productrepo := sqlite.NewProductRepository()
+	userrepo := sqlite.NewUserRepository()
 
 	fsmservice := service.NewFSMService(fsmrepo, orderrepo, productrepo, userrepo)
 	orderservice := service.NewOrderService(orderrepo)

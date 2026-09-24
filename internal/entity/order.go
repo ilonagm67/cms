@@ -13,7 +13,6 @@ const (
 )
 
 type Order struct {
-	ID       int64
 	UserID   int64
 	Products map[string]map[int]*Product
 	PayType  string
