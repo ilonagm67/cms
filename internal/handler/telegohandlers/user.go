@@ -21,7 +21,7 @@ func NewUserHandler(FSMService *service.FSMService, UserService *service.UserSer
 
 func (handler *UserHandler) StatePredicate(targetState string) th.Predicate {
 	return func(ctx context.Context, update telego.Update) bool {
-		userID := update.Message.From.ID
+		userID := update.Message.Chat.ID
 		state, err := handler.FSMService.GetCurrentState(userID)
 		if err != nil {
 			return false
@@ -60,9 +60,9 @@ func (handler *UserHandler) HandleQuestionProcess(ctx *th.Context, update telego
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 		return err
 	}
-	adminID := os.Getenv("ADMIN")
-	ID, _ := strconv.ParseInt(adminID, 10, 64)
-	SendMessage(ctx, ID, update.Message.Text, nil)
+	adminStr := os.Getenv("ADMIN")
+	AdminID, _ := strconv.ParseInt(adminStr, 10, 64)
+	SendMessage(ctx, AdminID, update.Message.Text, nil)
 	SendMessage(ctx, update.Message.Chat.ID, "Вопрос отправлен!", MainKeyboard)
 	return nil
 }
@@ -79,28 +79,43 @@ func (handler *UserHandler) HandleStart(ctx *th.Context, update telego.Update) e
 }
 
 func (handler *UserHandler) HandleName(ctx *th.Context, update telego.Update) error {
-	err := handler.FSMService.UserProcessName(update.Message.Chat.ID, update.Message.Text)
-	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
-		return err
+	switch {
+	case update.Message.Text != "":
+		err := handler.FSMService.UserProcessName(update.Message.Chat.ID, update.Message.Text)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+			return err
+		}
+	default:
+		SendMessage(ctx, update.Message.Chat.ID, "Введите имя!", nil)
+		return nil
 	}
 	SendMessage(ctx, update.Message.Chat.ID, "Введите ваш телефон:", NumberKeyboard)
 	return nil
 }
 
 func (handler *UserHandler) HandlePhone(ctx *th.Context, update telego.Update) error {
-	if update.Message.Text == "" {
+	switch {
+	case update.Message.Contact != nil:
 		err := handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Contact.PhoneNumber)
 		if err != nil {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 			return err
 		}
-	} else {
-		err := handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Text)
+	case update.Message.Text != "":
+		_, err := strconv.ParseUint(update.Message.Text, 64, 10)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Введите телефон!", nil)
+			return err
+		}
+		err = handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 			return err
 		}
+	default:
+		SendMessage(ctx, update.Message.Chat.ID, "Введите телефон!", nil)
+		return nil
 	}
 	SendMessage(ctx, update.Message.Chat.ID, "Вы успешно зарегистрировались!", nil)
 	SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
