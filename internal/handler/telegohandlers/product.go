@@ -168,7 +168,7 @@ func (handler *ProductHandler) HandleCatalogAddImage(ctx *th.Context, update tel
 		if len(photos) > 0 {
 			bestPhoto := photos[len(photos)-1]
 
-			file, err := DownloadImage(ctx, "photo", bestPhoto.FileID, bestPhoto.FileUniqueID)
+			file, err := DownloadImage(ctx, "data/photo", bestPhoto.FileID, bestPhoto.FileUniqueID)
 			if err != nil {
 				SendMessage(ctx, chatID, "Произошла ошибка", MainKeyboard)
 				return err

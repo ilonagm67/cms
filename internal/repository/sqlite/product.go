@@ -15,7 +15,7 @@ type ProductRepository struct {
 }
 
 func NewProductRepository() *ProductRepository {
-	db, err := sql.Open("sqlite", "./products.db")
+	db, err := sql.Open("sqlite", "data/products.db")
 	if err != nil {
 		log.Fatal(err)
 		return nil

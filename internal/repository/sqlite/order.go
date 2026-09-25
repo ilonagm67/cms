@@ -13,7 +13,7 @@ type OrderRepository struct {
 }
 
 func NewOrderRepository() *OrderRepository {
-	db, err := sql.Open("sqlite", "./sqlite.db")
+	db, err := sql.Open("sqlite", "data/orders.db")
 	if err != nil {
 		log.Fatal(err)
 		return nil

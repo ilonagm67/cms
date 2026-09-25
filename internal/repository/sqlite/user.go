@@ -15,7 +15,7 @@ type UserRepository struct {
 }
 
 func NewUserRepository() *UserRepository {
-	db, err := sql.Open("sqlite", "./users.db")
+	db, err := sql.Open("sqlite", "data/users.db")
 	if err != nil {
 		log.Fatal(err)
 		return nil
