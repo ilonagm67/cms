@@ -12,7 +12,7 @@ import (
 
 func main() {
 	fsmrepo := memory.NewFSMRepository()
-	orderrepo := memory.NewOrderRepository()
+	orderrepo := sqlite.NewOrderRepository()
 	productrepo := sqlite.NewProductRepository()
 	userrepo := sqlite.NewUserRepository()
 

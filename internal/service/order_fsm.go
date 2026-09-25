@@ -130,24 +130,15 @@ func (Service *FSMService) ProcessOrderProductsDeleteName(id int64, text string)
 }
 
 func (Service *FSMService) ProcessOrderProductsDeleteWeight(id int64, weight int) error {
-	order, err := Service.OrderRepo.Get(id)
-	if err != nil {
-		Service.FSMRepo.Delete(id)
-		return err
-	}
 	fsmName, err := Service.FSMRepo.GetName(id)
 	if err != nil {
 		Service.FSMRepo.Delete(id)
 		return err
 	}
-	for ProductName, Weights := range order.Products {
-		if ProductName == fsmName {
-			if len(Weights) > 1 {
-				delete(Weights, weight)
-			} else {
-				delete(order.Products, ProductName)
-			}
-		}
+	err = Service.OrderRepo.DeleteProduct(id, fsmName, weight)
+	if err != nil {
+		Service.FSMRepo.Delete(id)
+		return err
 	}
 	Service.FSMRepo.Set(id, "order_pre_delivery")
 	return nil
