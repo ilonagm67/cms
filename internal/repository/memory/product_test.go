@@ -11,8 +11,9 @@ import (
 func TestProductAddSuccessfully(t *testing.T) {
 	ProductName := gofakeit.Name()
 	ProductWeight := gofakeit.Number(0, 10)
+	product := &entity.Product{Name: ProductName, Weight: ProductWeight}
 	repo := memory.NewProductRepository()
-	err := repo.Add(&entity.Product{Name: ProductName, Weight: ProductWeight})
+	err := repo.Add(product)
 	if err != nil {
 		t.Errorf("Test Product Add Return Error")
 	}

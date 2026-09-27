@@ -52,11 +52,15 @@ func (repo *ProductRepository) Delete(Name string, Weight int) error {
 }
 
 func (repo *ProductRepository) Get(Name string, Weight int) (*entity.Product, error) {
-	i, ok := repo.products[Name][Weight]
-	if ok {
-		return i, nil
+	weights, ok := repo.products[Name]
+	if !ok {
+		return nil, fmt.Errorf("ProductName: %s Not Found!", Name)
 	}
-	return nil, fmt.Errorf("Product Not Found, Name: %s, Weight: %d", Name, Weight)
+	product, ok := weights[Weight]
+	if !ok {
+		return nil, fmt.Errorf("ProductWeight: %d Not Found!", Weight)
+	}
+	return product, nil
 }
 
 func (repo *ProductRepository) List() (map[string]map[int]*entity.Product, error) {
