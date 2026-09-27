@@ -14,7 +14,7 @@ func TestUserAddSuccessfull(t *testing.T) {
 	repo := memory.NewUserRepository()
 	err := repo.Add(ID, &entity.User{ID: ID, Name: User})
 	if err != nil {
-		t.Errorf("Test Repo Add return error")
+		t.Errorf("Test User Add return error")
 	}
 }
 

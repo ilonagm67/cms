@@ -15,13 +15,14 @@ func NewFSMRepository() *FSMRepository {
 	}
 }
 
-func (repo *FSMRepository) Set(ID int64, State entity.State) {
+func (repo *FSMRepository) Set(ID int64, State entity.State) error {
 	_, ok := repo.states[ID]
 	if !ok {
 		repo.states[ID] = &entity.FSM{UserID: ID, State: State}
-	} else {
-		repo.states[ID].State = State
+		return nil
 	}
+	repo.states[ID].State = State
+	return nil
 }
 
 func (repo *FSMRepository) SetName(ID int64, Name string) error {

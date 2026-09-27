@@ -116,11 +116,13 @@ func DownloadImage(ctx *th.Context, Folder, ID, Unique string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	URL := ctx.Bot().FileDownloadURL(file.FilePath)
 	resp, err := http.Get(URL)
 	if err != nil {
 		return "", err
 	}
+
 	_, err = os.ReadDir(Folder)
 	if err != nil {
 		err = os.Mkdir(Folder, 0755)
@@ -128,11 +130,14 @@ func DownloadImage(ctx *th.Context, Folder, ID, Unique string) (string, error) {
 			return "", err
 		}
 	}
+
 	filepath := path.Join(Folder, Unique+".jpg")
 	out, err := os.Create(filepath)
 	if err != nil {
 		return "", err
 	}
+	defer out.Close()
+
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		return "", err

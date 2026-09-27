@@ -79,7 +79,10 @@ func (repo *OrderRepository) Add(customerID int64, order *entity.Order) error {
 }
 
 func (repo *OrderRepository) DeleteProduct(customerID int64, product string, weight int) error {
-	query := `SELECT Products FROM orders WHERE CustomerID = ?`
+	query := `
+		SELECT Products 
+		FROM orders 
+		WHERE CustomerID = ?`
 	var jsonBytes []byte
 
 	err := repo.DB.QueryRow(query, customerID).Scan(&jsonBytes)
@@ -117,7 +120,10 @@ func (repo *OrderRepository) DeleteProduct(customerID int64, product string, wei
 		return fmt.Errorf("failed to marshal updated products: %w", err)
 	}
 
-	updateQuery := `UPDATE orders SET Products = ? WHERE CustomerID = ?`
+	updateQuery := `
+		UPDATE orders 
+		SET Products = ? 
+		WHERE CustomerID = ?`
 	if _, err := repo.DB.Exec(updateQuery, string(updatedJSON), customerID); err != nil {
 		return fmt.Errorf("failed to update order %d after deletion: %w", customerID, err)
 	}
@@ -126,7 +132,10 @@ func (repo *OrderRepository) DeleteProduct(customerID int64, product string, wei
 }
 
 func (repo *OrderRepository) Get(ID int64) (*entity.Order, error) {
-	query := `SELECT CustomerID, Products, PayType, Address, Delivery FROM orders WHERE CustomerID = ?`
+	query := `
+		SELECT CustomerID, Products, PayType, Address, Delivery 
+		FROM orders 
+		WHERE CustomerID = ?`
 
 	var (
 		order     entity.Order
@@ -160,7 +169,9 @@ func (repo *OrderRepository) Get(ID int64) (*entity.Order, error) {
 }
 
 func (repo *OrderRepository) List() (map[int64]*entity.Order, error) {
-	query := `SELECT CustomerID, Products, PayType, Address, Delivery FROM orders`
+	query := `
+		SELECT CustomerID, Products, PayType, Address, Delivery 
+		FROM orders`
 
 	rows, err := repo.DB.Query(query)
 	if err != nil {

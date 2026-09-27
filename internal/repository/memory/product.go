@@ -17,6 +17,9 @@ func NewProductRepository() *ProductRepository {
 }
 
 func (repo *ProductRepository) Add(Product *entity.Product) error {
+	if Product.Name == "" || Product.Weight == 0 {
+		return fmt.Errorf("Product Name or Weight Not Found")
+	}
 	_, exists := repo.products[Product.Name]
 	if !exists {
 		repo.products[Product.Name] = make(map[int]*entity.Product)
@@ -25,13 +28,27 @@ func (repo *ProductRepository) Add(Product *entity.Product) error {
 	return nil
 }
 
-func (repo *ProductRepository) Delete(Name string) error {
-	_, ok := repo.products[Name]
-	if ok {
-		delete(repo.products, Name)
-		return nil
+func (repo *ProductRepository) Delete(Name string, Weight int) error {
+	if Name == "" || Weight == 0 {
+		return fmt.Errorf("Name or Weight not Permitted!")
 	}
-	return fmt.Errorf("Product Not Found: %s", Name)
+
+	weights, ok := repo.products[Name]
+	if !ok {
+		return fmt.Errorf("ProductName: %s Not Found!", Name)
+	}
+	_, ok = weights[Weight]
+	if !ok {
+		return fmt.Errorf("ProductWeight: %d Not Found!", Weight)
+	}
+
+	delete(weights, Weight)
+
+	if len(weights) == 0 {
+		delete(repo.products, Name)
+	}
+
+	return nil
 }
 
 func (repo *ProductRepository) Get(Name string, Weight int) (*entity.Product, error) {

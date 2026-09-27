@@ -3,6 +3,7 @@ package memory
 import (
 	"cms/internal/entity"
 	"errors"
+	"fmt"
 )
 
 type OrderRepository struct {
@@ -17,6 +18,25 @@ func NewOrderRepository() *OrderRepository {
 
 func (repo *OrderRepository) Add(ID int64, Order *entity.Order) error {
 	repo.orders[ID] = Order
+	return nil
+}
+
+func (repo *OrderRepository) DeleteProduct(ID int64, Name string, Weight int) error {
+	products := repo.orders[ID].Products
+	weights, productExists := products[Name]
+	if !productExists {
+		return fmt.Errorf("product category %q not found for customer %d", Name, ID)
+	}
+
+	if _, weightExists := weights[Weight]; !weightExists {
+		return fmt.Errorf("weight %d not found under product %q", Weight, Name)
+	}
+
+	delete(weights, Weight)
+
+	if len(weights) == 0 {
+		delete(products, Name)
+	}
 	return nil
 }
 
