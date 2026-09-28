@@ -3,16 +3,17 @@ module cms
 go 1.27.1
 
 require (
+	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/gorilla/mux v1.8.1
 	github.com/mymmrac/telego v1.12.1
 	github.com/prometheus/client_golang v1.24.1
+	go.uber.org/mock v0.6.0
 	modernc.org/sqlite v1.58.0
 )
 
 require (
 	github.com/andybalholm/brotli v1.2.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/brianvoe/gofakeit v3.18.0+incompatible // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
 	github.com/bytedance/sonic v1.15.3 // indirect
 	github.com/bytedance/sonic/loader v0.5.2 // indirect
