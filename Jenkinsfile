@@ -13,10 +13,10 @@ pipeline {
 				sh "go build ."
 			}
 		}
-		post {
-			success {
-				archiveArtifacts artifacts: "cms",fingerprint: true
-			}
+	}
+	post {
+		success {
+			archiveArtifacts artifacts: "cms",fingerprint: true
 		}
 	}
 }
