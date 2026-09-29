@@ -18,12 +18,17 @@ var MainKeyboard = tu.Keyboard(
 	tu.KeyboardRow(
 		tu.KeyboardButton("🛍Заказать товар"),
 	),
-	tu.KeyboardRow(
-		tu.KeyboardButton("❓Вопрос"),
-	),
-	tu.KeyboardRow(
-		tu.KeyboardButton("📞Контакты"),
-	),
+
+// tu.KeyboardRow(
+//
+//	tu.KeyboardButton("❓Вопрос"),
+//
+// ),
+// tu.KeyboardRow(
+//
+//	tu.KeyboardButton("📞Контакты"),
+//
+// ),
 ).WithOneTimeKeyboard().WithResizeKeyboard()
 
 var NumberKeyboard = tu.Keyboard(

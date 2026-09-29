@@ -48,7 +48,7 @@ func (r *Router) RegisterHandlers(bh *th.BotHandler) {
 	bh.Handle(r.UserHandler.HandleStart, th.CommandEqual("start"))
 	bh.Handle(r.UserHandler.HandleName, r.UserHandler.StatePredicate("user_name"))
 	bh.Handle(r.UserHandler.HandlePhone, r.UserHandler.StatePredicate("user_phone"))
-	bh.Handle(r.UserHandler.HandleQuestionStart, th.TextEqual("❓Вопрос"))
+	//bh.Handle(r.UserHandler.HandleQuestionStart, th.TextEqual("❓Вопрос"))
 	bh.Handle(r.UserHandler.HandleQuestionProcess, r.UserHandler.StatePredicate("user_question"))
 	bh.Handle(r.OrderHandler.HandleStart, th.TextEqual("🛍Заказать товар"))
 	bh.Handle(r.OrderHandler.HandleOrderProducts, r.UserHandler.StatePredicate("order_products"))
