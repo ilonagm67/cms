@@ -13,8 +13,8 @@ func NewProductService(ProductRepo usecase.ProductRepository) *ProductService {
 	return &ProductService{ProductRepo: ProductRepo}
 }
 
-func (Service *ProductService) Delete(name string) error {
-	err := Service.ProductRepo.Delete(name)
+func (Service *ProductService) Delete(name string, weight int) error {
+	err := Service.ProductRepo.Delete(name, weight)
 	if err != nil {
 		return err
 	}

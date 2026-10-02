@@ -2,7 +2,6 @@ package memory
 
 import (
 	"cms/internal/entity"
-	"errors"
 	"fmt"
 )
 
@@ -77,5 +76,5 @@ func (repo *OrderRepository) List() (map[int64]*entity.Order, error) {
 	if len(repo.orders) > 0 {
 		return repo.orders, nil
 	}
-	return nil, errors.New("No Items in Database Orders")
+	return nil, fmt.Errorf("No Items in Database Orders")
 }

@@ -27,6 +27,54 @@ func TestUserAddError(t *testing.T) {
 	}
 }
 
+func TestUserSetNameSuccessfull(t *testing.T) {
+	ID := gofakeit.Int64()
+	User := gofakeit.Name()
+	repo := memory.NewUserRepository()
+	err := repo.Add(ID, &entity.User{ID: ID})
+	if err != nil {
+		t.Errorf("Test SetName UserAdd return error")
+	}
+	err = repo.SetName(ID, User)
+	if err != nil {
+		t.Errorf("Test SetName return error")
+	}
+}
+
+func TestUserSetNameError(t *testing.T) {
+	ID := gofakeit.Int64()
+	User := gofakeit.Name()
+	repo := memory.NewUserRepository()
+	err := repo.SetName(ID, User)
+	if err == nil {
+		t.Errorf("Test SetName return nil")
+	}
+}
+
+func TestUserSetPhoneSuccessfull(t *testing.T) {
+	ID := gofakeit.Int64()
+	Phone := gofakeit.Phone()
+	repo := memory.NewUserRepository()
+	err := repo.Add(ID, &entity.User{ID: ID})
+	if err != nil {
+		t.Errorf("Test SetName UserAdd return error")
+	}
+	err = repo.SetPhone(ID, Phone)
+	if err != nil {
+		t.Errorf("Test SetPhone return error")
+	}
+}
+
+func TestUserSetPhoneError(t *testing.T) {
+	ID := gofakeit.Int64()
+	User := gofakeit.Name()
+	repo := memory.NewUserRepository()
+	err := repo.SetName(ID, User)
+	if err == nil {
+		t.Errorf("Test SetName return nil")
+	}
+}
+
 func TestUserDeleteSuccessfull(t *testing.T) {
 	ID := gofakeit.Int64()
 	User := &entity.User{ID: ID}

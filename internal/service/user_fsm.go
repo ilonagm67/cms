@@ -25,12 +25,7 @@ func (Service *FSMService) UserStart(id int64) error {
 }
 
 func (Service *FSMService) UserProcessName(id int64, name string) error {
-	user, err := Service.UserRepo.Get(id)
-	if err != nil {
-		return err
-	}
-	user.Name = name
-	err = Service.UserRepo.Add(id, user)
+	err := Service.UserRepo.SetName(id, name)
 	if err != nil {
 		return err
 	}
@@ -39,12 +34,7 @@ func (Service *FSMService) UserProcessName(id int64, name string) error {
 }
 
 func (Service *FSMService) UserProcessPhone(id int64, number string) error {
-	user, err := Service.UserRepo.Get(id)
-	if err != nil {
-		return err
-	}
-	user.Number = number
-	err = Service.UserRepo.Add(id, user)
+	err := Service.UserRepo.SetPhone(id, number)
 	if err != nil {
 		return err
 	}

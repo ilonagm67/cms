@@ -67,12 +67,12 @@ func (repo *ProductRepository) Add(product *entity.Product) error {
 	return nil
 }
 
-func (repo *ProductRepository) Delete(name string) error {
-	query := `DELETE FROM products WHERE Name = ?`
+func (repo *ProductRepository) Delete(name string, weight int) error {
+	query := `DELETE FROM products WHERE Name = ? AND Weight = ?`
 
-	result, err := repo.DB.Exec(query, name)
+	result, err := repo.DB.Exec(query, name, weight)
 	if err != nil {
-		return fmt.Errorf("failed to delete product %s: %w", name, err)
+		return fmt.Errorf("failed to delete product Name: %s, Weight: %d, %w", name, weight, err)
 	}
 
 	rowsAffected, err := result.RowsAffected()
@@ -81,7 +81,7 @@ func (repo *ProductRepository) Delete(name string) error {
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("product %s not found", name)
+		return fmt.Errorf("product name: %s weight: %d, not found", name, weight)
 	}
 
 	return nil

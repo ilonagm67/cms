@@ -2,7 +2,6 @@ package memory
 
 import (
 	"cms/internal/entity"
-	"errors"
 	"fmt"
 )
 
@@ -32,7 +31,7 @@ func (repo *FSMRepository) Set(ID int64, State entity.State) error {
 func (repo *FSMRepository) SetName(ID int64, Name string) error {
 	_, ok := repo.states[ID]
 	if !ok {
-		return fmt.Errorf("ID: %d Not Found", ID)
+		return fmt.Errorf("FSM ID: %d Not Found", ID)
 	}
 	repo.states[ID].DataName = Name
 	return nil
@@ -41,10 +40,10 @@ func (repo *FSMRepository) SetName(ID int64, Name string) error {
 func (repo *FSMRepository) GetName(ID int64) (string, error) {
 	_, ok := repo.states[ID]
 	if !ok {
-		return "", fmt.Errorf("ID: %d Not Found", ID)
+		return "", fmt.Errorf("FSM ID: %d Not Found", ID)
 	}
 	if repo.states[ID].DataName == "" {
-		return "", errors.New("DataName is empty")
+		return "", fmt.Errorf("DataName is empty")
 	}
 	return repo.states[ID].DataName, nil
 }
@@ -52,7 +51,7 @@ func (repo *FSMRepository) GetName(ID int64) (string, error) {
 func (repo *FSMRepository) SetWeight(ID int64, Weight int) error {
 	_, ok := repo.states[ID]
 	if !ok {
-		return fmt.Errorf("ID: %d Not Found", ID)
+		return fmt.Errorf("FSM ID: %d Not Found", ID)
 	}
 	repo.states[ID].DataWeight = Weight
 	return nil
@@ -61,10 +60,10 @@ func (repo *FSMRepository) SetWeight(ID int64, Weight int) error {
 func (repo *FSMRepository) GetWeight(ID int64) (int, error) {
 	_, ok := repo.states[ID]
 	if !ok {
-		return 0, fmt.Errorf("ID: %d Not Found", ID)
+		return 0, fmt.Errorf("FSM ID: %d Not Found", ID)
 	}
 	if repo.states[ID].DataWeight == 0 {
-		return 0, errors.New("DataWeight is empty")
+		return 0, fmt.Errorf("DataWeight is empty")
 	}
 	return repo.states[ID].DataWeight, nil
 }
@@ -83,5 +82,5 @@ func (repo *FSMRepository) Get(ID int64) (entity.State, error) {
 	if ok {
 		return fsm.State, nil
 	}
-	return "", errors.New("FSM not Found")
+	return "", fmt.Errorf("FSM ID: %d Not Found", ID)
 }

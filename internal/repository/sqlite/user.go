@@ -59,6 +59,44 @@ func (repo *UserRepository) Add(ID int64, User *entity.User) error {
 	return nil
 }
 
+func (repo *UserRepository) SetName(ID int64, Name string) error {
+	if ID == 0 || Name == "" {
+		return fmt.Errorf("ID or Name not set!")
+	}
+	var existingID int64
+	query := `SELECT ID FROM users WHERE ID = ?`
+	err := repo.DB.QueryRow(query, ID).Scan(&existingID)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("User ID: %d Not Found!", ID)
+	}
+	updateQuery := `UPDATE users SET Name = ? WHERE ID = ?`
+	_, err = repo.DB.Exec(updateQuery, Name, ID)
+	if err != nil {
+		return fmt.Errorf("failed to update user: %w", err)
+	}
+	return nil
+}
+
+func (repo *UserRepository) SetPhone(ID int64, Phone string) error {
+	if ID == 0 || Phone == "" {
+		return fmt.Errorf("ID or Name not set!")
+	}
+	var existingID int64
+	query := `SELECT ID FROM users WHERE ID = ?`
+	err := repo.DB.QueryRow(query, ID).Scan(&existingID)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("User ID: %d Not Found!", ID)
+	}
+	updateQuery := `UPDATE users SET Name = ? WHERE ID = ?`
+	_, err = repo.DB.Exec(updateQuery, Phone, ID)
+	if err != nil {
+		return fmt.Errorf("failed to update user: %w", err)
+	}
+	return nil
+}
+
 func (repo *UserRepository) Delete(ID int64) error {
 	query := `DELETE FROM users WHERE ID = ?`
 	result, err := repo.DB.Exec(query, ID)

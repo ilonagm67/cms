@@ -2,7 +2,7 @@ package service
 
 import (
 	"cms/internal/entity"
-	"errors"
+	"fmt"
 	"os"
 	"strconv"
 )
@@ -52,7 +52,7 @@ func (Service *FSMService) ProductCatalogName(id int64, text string) error {
 			}
 		}
 		Service.FSMRepo.Delete(id)
-		return errors.New("Product Not Found")
+		return fmt.Errorf("Product: %s Not Found", text)
 	}
 	return nil
 }
