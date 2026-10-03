@@ -38,6 +38,9 @@ func (Service *UserService) List() (map[int64]*entity.User, error) {
 }
 
 func (Service *UserService) Health() (string, error) {
-	message := "Healthy"
-	return message, nil
+	err := Service.UserRepo.Health()
+	if err != nil {
+		return "", err
+	}
+	return "Healthy", nil
 }

@@ -9,4 +9,5 @@ type UserRepository interface {
 	Delete(ID int64) error
 	Get(ID int64) (*entity.User, error)
 	List() (map[int64]*entity.User, error)
+	Health() error
 }
