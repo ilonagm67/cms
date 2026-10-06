@@ -84,13 +84,14 @@ func (handler *UserHandler) HandleName(ctx *th.Context, update telego.Update) er
 		err := handler.FSMService.UserProcessName(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+			SendMessage(ctx, update.Message.Chat.ID, "Для регистрации введите ваше имя:", nil)
 			return err
 		}
 	default:
 		SendMessage(ctx, update.Message.Chat.ID, "Введите имя!", nil)
 		return nil
 	}
-	SendMessage(ctx, update.Message.Chat.ID, "Введите ваш телефон:", NumberKeyboard)
+	SendMessage(ctx, update.Message.Chat.ID, "Введите ваш телефон:\nНапример: +380000000000", NumberKeyboard)
 	return nil
 }
 
@@ -100,6 +101,7 @@ func (handler *UserHandler) HandlePhone(ctx *th.Context, update telego.Update) e
 		err := handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Contact.PhoneNumber)
 		if err != nil {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+			SendMessage(ctx, update.Message.Chat.ID, "Введите ваш телефон:\nНапример: +380000000000", NumberKeyboard)
 			return err
 		}
 	case update.Message.Text != "":
@@ -111,6 +113,7 @@ func (handler *UserHandler) HandlePhone(ctx *th.Context, update telego.Update) e
 		err = handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
+			SendMessage(ctx, update.Message.Chat.ID, "Введите ваш телефон:\nНапример: +380000000000", NumberKeyboard)
 			return err
 		}
 	default:
