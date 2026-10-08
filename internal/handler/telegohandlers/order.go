@@ -22,6 +22,7 @@ func NewOrderHandler(FSMService *service.FSMService, ProductService *service.Pro
 }
 
 func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) error {
+	SendMessage(ctx, update.Message.Chat.ID, "Внимание: Можно сделать только один заказ!", nil)
 	err := handler.FSMService.OrderStart(update.Message.Chat.ID)
 	if err != nil {
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
@@ -323,5 +324,15 @@ func (handler *OrderHandler) HandleOrderAddress(ctx *th.Context, update telego.U
 		return err
 	}
 	SendMessage(ctx, update.Message.Chat.ID, "Заказ создан!", MainKeyboard)
+	return nil
+}
+
+func (handler *OrderHandler) OrderGet(ctx *th.Context, update telego.Update) error {
+	message, err := handler.OrderService.String(update.Message.Chat.ID)
+	if err != nil {
+		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+		return err
+	}
+	SendMessage(ctx, update.Message.Chat.ID, message, MainKeyboard)
 	return nil
 }

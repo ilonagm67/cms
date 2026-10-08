@@ -18,6 +18,9 @@ var MainKeyboard = tu.Keyboard(
 	tu.KeyboardRow(
 		tu.KeyboardButton("🛍Заказать товар"),
 	),
+	tu.KeyboardRow(
+		tu.KeyboardButton("📦Мой заказ"),
+	),
 
 // tu.KeyboardRow(
 //
