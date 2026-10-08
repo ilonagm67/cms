@@ -68,7 +68,7 @@ func (Service *FSMService) ProcessProductsDeleteName(id int64, text string) erro
 		Service.FSMRepo.Delete(id)
 		return err
 	}
-	Service.FSMRepo.Set(id, "products_delete_weight")
+	Service.FSMRepo.Set(id, "product_delete_weight")
 	return nil
 }
 
