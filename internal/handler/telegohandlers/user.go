@@ -3,11 +3,13 @@ package telegohandlers
 import (
 	"cms/internal/service"
 	"context"
+	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
+	tu "github.com/mymmrac/telego/telegoutil"
 )
 
 type UserHandler struct {
@@ -74,6 +76,11 @@ func (handler *UserHandler) HandleStart(ctx *th.Context, update telego.Update) e
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 		return err
 	}
+	adminStr := os.Getenv("ADMIN")
+	AdminID, _ := strconv.ParseInt(adminStr, 10, 64)
+	admin := tu.ID(AdminID)
+	text := fmt.Sprintf("ВНИМАНИЕ! Этот бот находится на бета-версии, нашли ошибку отправьте фото ошибки на аккаунт: %s", admin.Username)
+	SendMessage(ctx, update.Message.Chat.ID, text, nil)
 	SendMessage(ctx, update.Message.Chat.ID, "Для регистрации введите ваше имя:", nil)
 	return nil
 }

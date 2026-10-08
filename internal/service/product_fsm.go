@@ -30,11 +30,10 @@ func (Service *FSMService) ProductCatalogStart(id int64) (bool, error) {
 }
 
 func (Service *FSMService) ProductCatalogName(id int64, text string) error {
-	switch text {
-	case "Добавить товар":
+	if text == "Добавить товар" {
 		Service.FSMRepo.Set(id, "product_name")
 		return nil
-	default:
+	} else {
 		list, err := Service.ProductRepo.List()
 		if err != nil {
 			Service.FSMRepo.Delete(id)
@@ -54,7 +53,6 @@ func (Service *FSMService) ProductCatalogName(id int64, text string) error {
 		Service.FSMRepo.Delete(id)
 		return fmt.Errorf("Product: %s Not Found", text)
 	}
-	return nil
 }
 
 func (Service *FSMService) ProductCatalogWeight(id int64, weight int) (*entity.Product, error) {

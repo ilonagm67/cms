@@ -249,7 +249,6 @@ func (handler *OrderHandler) HandleOrderPreDelivery(ctx *th.Context, update tele
 		SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию!", nil)
 		return nil
 	}
-	return nil
 }
 
 func (handler *OrderHandler) HandleOrderDelivery(ctx *th.Context, update telego.Update) error {
