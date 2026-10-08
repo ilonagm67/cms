@@ -138,3 +138,7 @@ func (repo *UserRepository) List() (map[int64]*entity.User, error) {
 	}
 	return result, nil
 }
+
+func (repo *UserRepository) Health() error {
+	return nil
+}
