@@ -2,7 +2,6 @@ package telegohandlers
 
 import (
 	"cms/internal/service"
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -45,9 +44,11 @@ func (handler *ProductHandler) HandleStart(ctx *th.Context, update telego.Update
 	if !admin {
 		keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
 		SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию:", keyboard)
-		return err
+		return nil
 	} else {
-		row = tu.KeyboardRow(tu.KeyboardButton("Добавить товар"))
+		row = tu.KeyboardRow(tu.KeyboardButton("Добавить товар"), tu.KeyboardButton("Удалить товар"))
+		rows = append(rows, row)
+		row = tu.KeyboardRow(tu.KeyboardButton("Назад"))
 		rows = append(rows, row)
 		keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
 		SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию:", keyboard)
@@ -62,12 +63,41 @@ func (handler *ProductHandler) HandleCatalogName(ctx *th.Context, update telego.
 		return err
 	}
 	switch update.Message.Text {
+	case "Назад":
+		handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
+		return nil
+	case "Удалить товар":
+		if admin != update.Message.Chat.ID {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return fmt.Errorf("ID: %d Want to delete product!", update.Message.Chat.ID)
+		} else {
+			handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+			var rows [][]telego.KeyboardButton
+			var row []telego.KeyboardButton
+			count := 0
+			list, _ := handler.ProductService.List()
+			for Product := range list {
+				row = append(row, tu.KeyboardButton(Product))
+				count++
+				if count%2 == 0 {
+					rows = append(rows, row)
+					row = nil
+				}
+			}
+			if len(row) > 0 {
+				rows = append(rows, row)
+			}
+			keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
+			SendMessage(ctx, update.Message.Chat.ID, "Выберите название:", keyboard)
+			return nil
+		}
 	case "Добавить товар":
 		if admin != update.Message.Chat.ID {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-			return errors.New("Want to add product!")
+			return fmt.Errorf("ID: %d Want to add product!", update.Message.Chat.ID)
 		} else {
-			err = handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+			handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
 			SendMessage(ctx, update.Message.Chat.ID, "Введите название:", nil)
 			return nil
 		}
@@ -104,6 +134,69 @@ func (handler *ProductHandler) HandleCatalogName(ctx *th.Context, update telego.
 		}
 		keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
 		SendMessage(ctx, update.Message.Chat.ID, "Выберите вес:", keyboard)
+		return nil
+	}
+}
+
+func (handler *ProductHandler) HandleCatalogDeleteName(ctx *th.Context, update telego.Update) error {
+	if update.Message.Text == "Назад" {
+		handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
+		return nil
+	} else {
+		err := handler.ProductService.ProcessProductsDeleteName(update.Message.Chat.ID, update.Message.Text)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		var rows [][]telego.KeyboardButton
+		var row []telego.KeyboardButton
+		count := 0
+		list, _ := handler.ProductService.List()
+		for _, Weights := range list {
+			for Weight, Product := range Weights {
+				if Product.Name == update.Message.Text {
+					weight := strconv.Itoa(Weight)
+					text := fmt.Sprintf("%dкг", Product.Weight)
+					err := SendMessage(ctx, update.Message.Chat.ID, text, nil)
+					if err != nil {
+						return err
+					}
+					row = append(row, tu.KeyboardButton(weight))
+					count++
+					if count%2 == 0 {
+						rows = append(rows, row)
+						row = nil
+					}
+				}
+			}
+		}
+		if len(row) > 0 {
+			rows = append(rows, row)
+		}
+		keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите вес:", keyboard)
+		return nil
+	}
+}
+
+func (handler *ProductHandler) HandleCatalogDeleteWeight(ctx *th.Context, update telego.Update) error {
+	if update.Message.Text == "Назад" {
+		handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
+		return nil
+	} else {
+		weight, err := strconv.Atoi(update.Message.Text)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Отправьте вес!", nil)
+			return err
+		}
+		err := handler.ProductService.ProcessProductsDeleteWeight(update.Message.Chat.ID, weight)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		SendMessage(ctx, update.Message.Chat.ID, "Товар удалён!", MainKeyboard)
 		return nil
 	}
 }

@@ -3,13 +3,11 @@ package telegohandlers
 import (
 	"cms/internal/service"
 	"context"
-	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
-	tu "github.com/mymmrac/telego/telegoutil"
 )
 
 type UserHandler struct {
@@ -70,17 +68,13 @@ func (handler *UserHandler) HandleQuestionProcess(ctx *th.Context, update telego
 }
 
 func (handler *UserHandler) HandleStart(ctx *th.Context, update telego.Update) error {
+	SendMessage(ctx, update.Message.Chat.ID, "ВНИМАНИЕ! Этот бот находится на бета-версии!", nil)
 	SendMessage(ctx, update.Message.Chat.ID, "Добро пожаловать в наш магазин!", nil)
 	err := handler.FSMService.UserStart(update.Message.Chat.ID)
 	if err != nil {
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
 		return err
 	}
-	adminStr := os.Getenv("ADMIN")
-	AdminID, _ := strconv.ParseInt(adminStr, 10, 64)
-	admin := tu.ID(AdminID)
-	text := fmt.Sprintf("ВНИМАНИЕ! Этот бот находится на бета-версии, нашли ошибку отправьте фото ошибки на аккаунт: %s", admin.Username)
-	SendMessage(ctx, update.Message.Chat.ID, text, nil)
 	SendMessage(ctx, update.Message.Chat.ID, "Для регистрации введите ваше имя:", nil)
 	return nil
 }
@@ -98,7 +92,7 @@ func (handler *UserHandler) HandleName(ctx *th.Context, update telego.Update) er
 		SendMessage(ctx, update.Message.Chat.ID, "Введите имя!", nil)
 		return nil
 	}
-	SendMessage(ctx, update.Message.Chat.ID, "Введите ваш телефон:\nНапример: +380000000000", NumberKeyboard)
+	SendMessage(ctx, update.Message.Chat.ID, "Введите ваш телефон:\n\n(Например: +380000000000)", NumberKeyboard)
 	return nil
 }
 

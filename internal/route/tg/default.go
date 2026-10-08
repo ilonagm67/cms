@@ -28,6 +28,11 @@ func NewRouter(Oh *telegohandlers.OrderHandler, Ph *telegohandlers.ProductHandle
 		log.Fatal("env ADMIN not found")
 	}
 
+	admin_username := os.Getenv("ADMIN_USERNAME")
+	if admin_username == "" {
+		log.Fatal("env ADMIN_USERNAME not found")
+	}
+
 	bot, err := telego.NewBot(token, telego.WithDefaultLogger(false, true))
 	if err != nil {
 		log.Fatal(err)
@@ -69,4 +74,6 @@ func (r *Router) RegisterHandlers(bh *th.BotHandler) {
 	bh.Handle(r.ProductHandler.HandleCatalogAddDescription, r.UserHandler.StatePredicate("product_description"))
 	bh.Handle(r.ProductHandler.HandleCatalogAddImage, r.UserHandler.StatePredicate("product_image"))
 	bh.Handle(r.ProductHandler.HandleCatalogAddPrice, r.UserHandler.StatePredicate("product_price"))
+	bh.Handle(r.ProductHandler.HandleCatalogDeleteName, r.UserHandler.StatePredicate("product_delete_name"))
+	bh.Handle(r.ProductHandler.HandleCatalogDeleteWeight, r.UserHandler.StatePredicate("product_delete_weight"))
 }

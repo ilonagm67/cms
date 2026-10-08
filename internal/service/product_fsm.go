@@ -30,10 +30,17 @@ func (Service *FSMService) ProductCatalogStart(id int64) (bool, error) {
 }
 
 func (Service *FSMService) ProductCatalogName(id int64, text string) error {
-	if text == "Добавить товар" {
+	switch text {
+	case "Удалить товар":
+		Service.FSMRepo.Set(id, "product_delete_name")
+		return nil
+	case "Назад":
+		Service.FSMRepo.Delete(id)
+		return nil
+	case "Добавить товар":
 		Service.FSMRepo.Set(id, "product_name")
 		return nil
-	} else {
+	default:
 		list, err := Service.ProductRepo.List()
 		if err != nil {
 			Service.FSMRepo.Delete(id)
@@ -53,6 +60,31 @@ func (Service *FSMService) ProductCatalogName(id int64, text string) error {
 		Service.FSMRepo.Delete(id)
 		return fmt.Errorf("Product: %s Not Found", text)
 	}
+}
+
+func (Service *FSMService) ProcessProductsDeleteName(id int64, text string) error {
+	err := Service.FSMRepo.SetName(id, text)
+	if err != nil {
+		Service.FSMRepo.Delete(id)
+		return err
+	}
+	Service.FSMRepo.Set(id, "products_delete_weight")
+	return nil
+}
+
+func (Service *FSMService) ProcessProductsDeleteWeight(id int64, weight int) error {
+	fsmName, err := Service.FSMRepo.GetName(id)
+	if err != nil {
+		Service.FSMRepo.Delete(id)
+		return err
+	}
+	err = Service.ProductRepo.Delete(fsmName, weight)
+	if err != nil {
+		Service.FSMRepo.Delete(id)
+		return err
+	}
+	Service.FSMRepo.Delete(id)
+	return nil
 }
 
 func (Service *FSMService) ProductCatalogWeight(id int64, weight int) (*entity.Product, error) {
