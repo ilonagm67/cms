@@ -144,7 +144,7 @@ func (handler *ProductHandler) HandleCatalogDeleteName(ctx *th.Context, update t
 		SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
 		return nil
 	} else {
-		err := handler.ProductService.ProcessProductsDeleteName(update.Message.Chat.ID, update.Message.Text)
+		err := handler.FSMService.ProcessProductsDeleteName(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
@@ -191,7 +191,7 @@ func (handler *ProductHandler) HandleCatalogDeleteWeight(ctx *th.Context, update
 			SendMessage(ctx, update.Message.Chat.ID, "Отправьте вес!", nil)
 			return err
 		}
-		err := handler.ProductService.ProcessProductsDeleteWeight(update.Message.Chat.ID, weight)
+		err = handler.FSMService.ProcessProductsDeleteWeight(update.Message.Chat.ID, weight)
 		if err != nil {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return err
