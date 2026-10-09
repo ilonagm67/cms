@@ -166,7 +166,6 @@ func (Service *FSMService) ProcessOrderPreDelivery(id int64, text string) error 
 	default:
 		return errors.New("Text not found!")
 	}
-	return nil
 }
 
 func (Service *FSMService) ProcessOrderDelivery(id int64, text string) error {

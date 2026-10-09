@@ -37,10 +37,13 @@ func (Service *OrderService) String(id int64) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	count := 1
 	for _, weights := range order.Products {
 		for _, product := range weights {
-			cart += fmt.Sprintf("Название: %s, Вес: %d, Количество: %d,Цена: %d\n", product.Name, product.Weight, product.Count, product.Price)
+			ProductTotal := product.Price * product.Count
+			cart += fmt.Sprintf("%d,Название: %s\nВес: %d\nКоличество: %d\nЦена за ед: %d\nОбщая Цена: %d\n\n", count, product.Name, product.Weight, product.Count, product.Price, ProductTotal)
 			Total += product.Price * product.Count
+			count++
 		}
 	}
 	return fmt.Sprintf("Ваш заказ:\n\n%s\nСумма: %d", cart, Total), nil

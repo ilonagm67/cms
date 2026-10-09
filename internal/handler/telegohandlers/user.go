@@ -3,6 +3,7 @@ package telegohandlers
 import (
 	"cms/internal/service"
 	"context"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -68,7 +69,9 @@ func (handler *UserHandler) HandleQuestionProcess(ctx *th.Context, update telego
 }
 
 func (handler *UserHandler) HandleStart(ctx *th.Context, update telego.Update) error {
-	SendMessage(ctx, update.Message.Chat.ID, "ВНИМАНИЕ! Этот бот находится на бета-версии!", nil)
+	admin := os.Getenv("ADMIN_USERNAME")
+	text := fmt.Sprintf("ВНИМАНИЕ! Этот бот находится на бета-версии!\n\nФото ошибок и предложений отправлять админу: @%s", admin)
+	SendMessage(ctx, update.Message.Chat.ID, text, nil)
 	SendMessage(ctx, update.Message.Chat.ID, "Добро пожаловать в наш магазин!", nil)
 	err := handler.FSMService.UserStart(update.Message.Chat.ID)
 	if err != nil {
@@ -102,7 +105,7 @@ func (handler *UserHandler) HandlePhone(ctx *th.Context, update telego.Update) e
 		err := handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Contact.PhoneNumber)
 		if err != nil {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
-			SendMessage(ctx, update.Message.Chat.ID, "Введите ваш телефон:\nНапример: +380000000000", NumberKeyboard)
+			SendMessage(ctx, update.Message.Chat.ID, "Введите ваш телефон:\n(Например: +380000000000)", NumberKeyboard)
 			return err
 		}
 	case update.Message.Text != "":
