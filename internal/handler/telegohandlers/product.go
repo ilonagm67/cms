@@ -72,7 +72,11 @@ func (handler *ProductHandler) HandleCatalogName(ctx *th.Context, update telego.
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 			return fmt.Errorf("ID: %d Want to delete product!", update.Message.Chat.ID)
 		} else {
-			handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+			err = handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+			if err != nil {
+				SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+				return err
+			}
 			var rows [][]telego.KeyboardButton
 			var row []telego.KeyboardButton
 			count := 0
