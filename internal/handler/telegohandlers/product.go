@@ -143,11 +143,12 @@ func (handler *ProductHandler) HandleCatalogName(ctx *th.Context, update telego.
 }
 
 func (handler *ProductHandler) HandleCatalogDeleteName(ctx *th.Context, update telego.Update) error {
-	if update.Message.Text == "Назад" {
+	switch update.Message.Text {
+	case "Назад":
 		handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
 		SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
 		return nil
-	} else {
+	default:
 		err := handler.FSMService.ProcessProductsDeleteName(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
@@ -185,11 +186,12 @@ func (handler *ProductHandler) HandleCatalogDeleteName(ctx *th.Context, update t
 }
 
 func (handler *ProductHandler) HandleCatalogDeleteWeight(ctx *th.Context, update telego.Update) error {
-	if update.Message.Text == "Назад" {
+	switch update.Message.Text {
+	case "Назад":
 		handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
 		SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
 		return nil
-	} else {
+	default:
 		weight, err := strconv.Atoi(update.Message.Text)
 		if err != nil {
 			SendMessage(ctx, update.Message.Chat.ID, "Отправьте вес!", nil)
@@ -206,62 +208,88 @@ func (handler *ProductHandler) HandleCatalogDeleteWeight(ctx *th.Context, update
 }
 
 func (handler *ProductHandler) HandleCatalogWeight(ctx *th.Context, update telego.Update) error {
-	weight, err := strconv.Atoi(update.Message.Text)
-	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Введите нормальное число!", nil)
-		return err
+	switch update.Message.Text {
+	case "Назад":
+		handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
+		return nil
+	default:
+		weight, err := strconv.Atoi(update.Message.Text)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Введите нормальное число!", nil)
+			return err
+		}
+		product, err := handler.FSMService.ProductCatalogWeight(update.Message.Chat.ID, weight)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		text := fmt.Sprintf("Название: %s\n\nОписание: %s\n\nВес: %d\nЦена: %d", product.Name, product.Description, product.Weight, product.Price)
+		SendMessagePhoto(ctx, update.Message.Chat.ID, text, product.Image, MainKeyboard)
+		return nil
 	}
-	product, err := handler.FSMService.ProductCatalogWeight(update.Message.Chat.ID, weight)
-	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-		return err
-	}
-	text := fmt.Sprintf("Название: %s\n\nОписание: %s\n\nВес: %d\nЦена: %d", product.Name, product.Description, product.Weight, product.Price)
-	SendMessagePhoto(ctx, update.Message.Chat.ID, text, product.Image, MainKeyboard)
-	return nil
 }
 
 func (handler *ProductHandler) HandleCatalogAddName(ctx *th.Context, update telego.Update) error {
-	if update.Message.Text == "" {
+	switch update.Message.Text {
+	case "Назад":
+		handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
+		return nil
+	case "":
 		SendMessage(ctx, update.Message.Chat.ID, "Отправьте Название!", nil)
 		return nil
+	default:
+		err := handler.FSMService.ProductAddingName(update.Message.Chat.ID, update.Message.Text)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		SendMessage(ctx, update.Message.Chat.ID, "Введите вес:", nil)
+		return nil
 	}
-	err := handler.FSMService.ProductAddingName(update.Message.Chat.ID, update.Message.Text)
-	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-		return err
-	}
-	SendMessage(ctx, update.Message.Chat.ID, "Введите вес:", nil)
-	return nil
 }
 
 func (handler *ProductHandler) HandleCatalogAddWeight(ctx *th.Context, update telego.Update) error {
-	weight, err := strconv.Atoi(update.Message.Text)
-	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Введите нормальное число!", nil)
-		return err
+	switch update.Message.Text {
+	case "Назад":
+		handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
+		return nil
+	default:
+		weight, err := strconv.Atoi(update.Message.Text)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Введите нормальное число!", nil)
+			return err
+		}
+		err = handler.FSMService.ProductAddingWeight(update.Message.Chat.ID, weight)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		SendMessage(ctx, update.Message.Chat.ID, "Введите Описание:", nil)
+		return nil
 	}
-	err = handler.FSMService.ProductAddingWeight(update.Message.Chat.ID, weight)
-	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-		return err
-	}
-	SendMessage(ctx, update.Message.Chat.ID, "Введите Описание:", nil)
-	return nil
 }
 
 func (handler *ProductHandler) HandleCatalogAddDescription(ctx *th.Context, update telego.Update) error {
-	if update.Message.Text == "" {
+	switch update.Message.Text {
+	case "Назад":
+		handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
+		return nil
+	case "":
 		SendMessage(ctx, update.Message.Chat.ID, "Отправьте Описание!", nil)
 		return nil
+	default:
+		err := handler.FSMService.ProductAddingDescription(update.Message.Chat.ID, update.Message.Text)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		SendMessage(ctx, update.Message.Chat.ID, "Отправьте изображение:", nil)
+		return nil
 	}
-	err := handler.FSMService.ProductAddingDescription(update.Message.Chat.ID, update.Message.Text)
-	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-		return err
-	}
-	SendMessage(ctx, update.Message.Chat.ID, "Отправьте изображение:", nil)
-	return nil
 }
 
 func (handler *ProductHandler) HandleCatalogAddImage(ctx *th.Context, update telego.Update) error {
@@ -289,22 +317,36 @@ func (handler *ProductHandler) HandleCatalogAddImage(ctx *th.Context, update tel
 			return nil
 		}
 	default:
-		SendMessage(ctx, update.Message.Chat.ID, "Отправьте Изображение!", nil)
+		switch update.Message.Text {
+		case "Назад":
+			handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+			SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
+			return nil
+		default:
+			SendMessage(ctx, update.Message.Chat.ID, "Отправьте Изображение!", nil)
+		}
 	}
 	return nil
 }
 
 func (handler *ProductHandler) HandleCatalogAddPrice(ctx *th.Context, update telego.Update) error {
-	price, err := strconv.Atoi(update.Message.Text)
-	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Введите нормальное число!", nil)
-		return err
+	switch update.Message.Text {
+	case "Назад":
+		handler.FSMService.ProductCatalogName(update.Message.Chat.ID, update.Message.Text)
+		SendMessage(ctx, update.Message.Chat.ID, "Выберите вариант из списка:", MainKeyboard)
+		return nil
+	default:
+		price, err := strconv.Atoi(update.Message.Text)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Введите нормальное число!", nil)
+			return err
+		}
+		err = handler.FSMService.ProductAddingPrice(update.Message.Chat.ID, price)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		SendMessage(ctx, update.Message.Chat.ID, "Товар создан!", MainKeyboard)
+		return nil
 	}
-	err = handler.FSMService.ProductAddingPrice(update.Message.Chat.ID, price)
-	if err != nil {
-		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
-		return err
-	}
-	SendMessage(ctx, update.Message.Chat.ID, "Товар создан!", MainKeyboard)
-	return nil
 }
