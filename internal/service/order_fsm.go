@@ -7,12 +7,12 @@ import (
 )
 
 func (Service *FSMService) OrderStart(id int64) error {
-	err := Service.OrderRepo.Add(id, &entity.Order{UserID: id})
+	_, err := Service.ProductRepo.List()
 	if err != nil {
 		Service.FSMRepo.Delete(id)
 		return err
 	}
-	_, err = Service.ProductRepo.List()
+	err = Service.OrderRepo.Add(id, &entity.Order{UserID: id})
 	if err != nil {
 		Service.FSMRepo.Delete(id)
 		return err
@@ -22,12 +22,12 @@ func (Service *FSMService) OrderStart(id int64) error {
 }
 
 func (Service *FSMService) ProcessOrderProducts(id int64, text string) error {
-	err := Service.FSMRepo.SetName(id, text)
+	list, err := Service.ProductRepo.List()
 	if err != nil {
 		Service.FSMRepo.Delete(id)
 		return err
 	}
-	list, err := Service.ProductRepo.List()
+	err = Service.FSMRepo.SetName(id, text)
 	if err != nil {
 		Service.FSMRepo.Delete(id)
 		return err
