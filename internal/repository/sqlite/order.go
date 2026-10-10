@@ -213,5 +213,9 @@ func (repo *OrderRepository) List() (map[int64]*entity.Order, error) {
 		return nil, fmt.Errorf("error iterating order rows: %w", err)
 	}
 
+	if len(orders) == 0 {
+		return nil, fmt.Errorf("No Items in Database Orders")
+	}
+
 	return orders, nil
 }

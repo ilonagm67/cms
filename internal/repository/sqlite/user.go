@@ -136,6 +136,9 @@ func (repo *UserRepository) List() (map[int64]*entity.User, error) {
 		rows.Scan(&user.ID, &user.Name, &user.Number)
 		result[user.ID] = &user
 	}
+	if len(result) == 0 {
+		return nil, fmt.Errorf("No Items in Database Users")
+	}
 	return result, nil
 }
 
