@@ -107,7 +107,9 @@ func (repo *ProductRepository) List() (map[string]map[int]*entity.Product, error
 	query := `SELECT Name, Description, Image, Weight, Count, Price FROM products`
 
 	rows, err := repo.DB.Query(query)
-	if err != nil {
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, fmt.Errorf("No Items in Database Products")
+	} else if err != nil {
 		return nil, fmt.Errorf("failed to query products list: %w", err)
 	}
 	defer rows.Close()

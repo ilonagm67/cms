@@ -32,6 +32,10 @@ func (Service *FSMService) ProductCatalogStart(id int64) (bool, error) {
 func (Service *FSMService) ProductCatalogName(id int64, text string) error {
 	switch text {
 	case "Удалить товар":
+		_, err := Service.ProductRepo.List()
+		if err != nil {
+			return err
+		}
 		Service.FSMRepo.Set(id, "product_delete_name")
 		return nil
 	case "Назад":
