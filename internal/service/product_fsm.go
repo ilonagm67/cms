@@ -82,6 +82,16 @@ func (Service *FSMService) ProcessProductsDeleteWeight(id int64, weight int) err
 		Service.FSMRepo.Delete(id)
 		return err
 	}
+	product, err := Service.ProductRepo.Get(fsmName, weight)
+	if err != nil {
+		Service.FSMRepo.Delete(id)
+		return err
+	}
+	err = os.Remove(product.Image)
+	if err != nil {
+		Service.FSMRepo.Delete(id)
+		return err
+	}
 	err = Service.ProductRepo.Delete(fsmName, weight)
 	if err != nil {
 		Service.FSMRepo.Delete(id)
