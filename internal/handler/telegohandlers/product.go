@@ -222,6 +222,10 @@ func (handler *ProductHandler) HandleCatalogWeight(ctx *th.Context, update teleg
 }
 
 func (handler *ProductHandler) HandleCatalogAddName(ctx *th.Context, update telego.Update) error {
+	if update.Message.Text == "" {
+		SendMessage(ctx, update.Message.Chat.ID, "Отправьте Название!", nil)
+		return nil
+	}
 	err := handler.FSMService.ProductAddingName(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
@@ -247,6 +251,10 @@ func (handler *ProductHandler) HandleCatalogAddWeight(ctx *th.Context, update te
 }
 
 func (handler *ProductHandler) HandleCatalogAddDescription(ctx *th.Context, update telego.Update) error {
+	if update.Message.Text == "" {
+		SendMessage(ctx, update.Message.Chat.ID, "Отправьте Описание!", nil)
+		return nil
+	}
 	err := handler.FSMService.ProductAddingDescription(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
