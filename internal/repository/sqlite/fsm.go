@@ -22,7 +22,7 @@ func NewFSMRepository() *FSMRepository {
 		UserID INTEGER,
 		State TEXT,
 		DataName TEXT,
-		DataWeight INTEGER,
+		DataWeight INTEGER
 	);`
 
 	_, err = db.Exec(sqlFSM)
