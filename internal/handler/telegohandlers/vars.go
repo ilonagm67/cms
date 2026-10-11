@@ -21,17 +21,6 @@ var MainKeyboard = tu.Keyboard(
 	tu.KeyboardRow(
 		tu.KeyboardButton("📦Мой заказ"),
 	),
-
-// tu.KeyboardRow(
-//
-//	tu.KeyboardButton("❓Вопрос"),
-//
-// ),
-// tu.KeyboardRow(
-//
-//	tu.KeyboardButton("📞Контакты"),
-//
-// ),
 ).WithOneTimeKeyboard().WithResizeKeyboard()
 
 var NumberKeyboard = tu.Keyboard(
@@ -86,7 +75,7 @@ var ReturnKeyboard = tu.Keyboard(
 	tu.KeyboardRow(
 		tu.KeyboardButton("🔙Назад"),
 	),
-).WithOneTimeKeyboard()
+).WithOneTimeKeyboard().WithResizeKeyboard()
 
 func SendMessagePhoto(ctx *th.Context, ID int64, text string, photo string, keyboard telego.ReplyMarkup) error {
 	_, err := ctx.Bot().SendPhoto(ctx, tu.Photo(

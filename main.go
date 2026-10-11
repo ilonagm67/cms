@@ -3,7 +3,6 @@ package main
 import (
 	"cms/internal/handler/telegohandlers"
 	"cms/internal/handler/web"
-	"cms/internal/repository/memory"
 	"cms/internal/repository/sqlite"
 	"cms/internal/route/http"
 	"cms/internal/route/tg"
@@ -11,7 +10,7 @@ import (
 )
 
 func main() {
-	fsmrepo := memory.NewFSMRepository()
+	fsmrepo := sqlite.NewFSMRepository()
 	orderrepo := sqlite.NewOrderRepository()
 	productrepo := sqlite.NewProductRepository()
 	userrepo := sqlite.NewUserRepository()

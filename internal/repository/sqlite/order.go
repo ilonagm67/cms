@@ -39,7 +39,7 @@ func NewOrderRepository() *OrderRepository {
 
 func (repo *OrderRepository) Add(customerID int64, order *entity.Order) error {
 	if order == nil {
-		return errors.New("cannot save a nil order")
+		return fmt.Errorf("cannot save a nil order")
 	}
 
 	encodedProducts, err := json.Marshal(order.Products)
