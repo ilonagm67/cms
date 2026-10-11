@@ -73,14 +73,14 @@ func (repo *UserRepository) SetName(ID int64, Name string) error {
 	updateQuery := `UPDATE users SET Name = ? WHERE ID = ?`
 	_, err = repo.DB.Exec(updateQuery, Name, ID)
 	if err != nil {
-		return fmt.Errorf("failed to update user: %w", err)
+		return fmt.Errorf("failed to update name user: %w", err)
 	}
 	return nil
 }
 
 func (repo *UserRepository) SetPhone(ID int64, Phone string) error {
 	if ID == 0 || Phone == "" {
-		return fmt.Errorf("ID or Name not set!")
+		return fmt.Errorf("ID or Phone not set!")
 	}
 	var existingID int64
 	query := `SELECT ID FROM users WHERE ID = ?`
@@ -89,10 +89,10 @@ func (repo *UserRepository) SetPhone(ID int64, Phone string) error {
 	if errors.Is(err, sql.ErrNoRows) {
 		return fmt.Errorf("User ID: %d Not Found!", ID)
 	}
-	updateQuery := `UPDATE users SET Name = ? WHERE ID = ?`
+	updateQuery := `UPDATE users SET Number = ? WHERE ID = ?`
 	_, err = repo.DB.Exec(updateQuery, Phone, ID)
 	if err != nil {
-		return fmt.Errorf("failed to update user: %w", err)
+		return fmt.Errorf("failed to update phone user: %w", err)
 	}
 	return nil
 }
