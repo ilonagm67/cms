@@ -3,7 +3,6 @@ package telegohandlers
 import (
 	"cms/internal/service"
 	"context"
-	"fmt"
 	"os"
 	"strconv"
 
@@ -69,9 +68,6 @@ func (handler *UserHandler) HandleQuestionProcess(ctx *th.Context, update telego
 }
 
 func (handler *UserHandler) HandleStart(ctx *th.Context, update telego.Update) error {
-	admin := os.Getenv("ADMIN_USERNAME")
-	text := fmt.Sprintf("ВНИМАНИЕ! Этот бот находится на бета-версии!\n\nФото ошибок и предложений отправлять админу: @%s", admin)
-	SendMessage(ctx, update.Message.Chat.ID, text, nil)
 	SendMessage(ctx, update.Message.Chat.ID, "Добро пожаловать в наш магазин!", nil)
 	err := handler.FSMService.UserStart(update.Message.Chat.ID)
 	if err != nil {
