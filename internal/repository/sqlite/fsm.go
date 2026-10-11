@@ -49,11 +49,11 @@ func (repo *FSMRepository) Set(ID int64, State entity.State) error {
 				VALUES (?, ?)`
 			_, err := repo.DB.Exec(insertQuery, ID, State)
 			if err != nil {
-				return fmt.Errorf("failed to insert order %d: %w", ID, err)
+				return fmt.Errorf("failed to insert FSM ID: %d, %w", ID, err)
 			}
 			return nil
 		}
-		return fmt.Errorf("failed to check existing order %d: %w", ID, err)
+		return fmt.Errorf("failed to check existing FSM ID: %d, %w", ID, err)
 	}
 	updateQuery := `
 		UPDATE FSM
@@ -61,7 +61,7 @@ func (repo *FSMRepository) Set(ID int64, State entity.State) error {
 		WHERE UserID = ?`
 	_, err = repo.DB.Exec(updateQuery, State, ID)
 	if err != nil {
-		return fmt.Errorf("failed to update order %d: %w", ID, err)
+		return fmt.Errorf("failed to update FSM ID: %d, %w", ID, err)
 	}
 	return nil
 }
@@ -71,9 +71,9 @@ func (repo *FSMRepository) SetName(ID int64, Name string) error {
 		return fmt.Errorf("cannot save a empty DataName")
 	}
 
-	var existingName string
-	checkQuery := `SELECT DataName FROM FSM WHERE UserID = ?`
-	err := repo.DB.QueryRow(checkQuery, ID).Scan(&existingName)
+	var existingID int64
+	checkQuery := `SELECT UserID FROM FSM WHERE UserID = ?`
+	err := repo.DB.QueryRow(checkQuery, ID).Scan(&existingID)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -82,11 +82,11 @@ func (repo *FSMRepository) SetName(ID int64, Name string) error {
 				VALUES (?, ?)`
 			_, err := repo.DB.Exec(insertQuery, ID, Name)
 			if err != nil {
-				return fmt.Errorf("failed to insert order %d: %w", ID, err)
+				return fmt.Errorf("failed to insert FSM DataName %d: %w", ID, err)
 			}
 			return nil
 		}
-		return fmt.Errorf("failed to check existing order %d: %w", ID, err)
+		return fmt.Errorf("failed to check existing FSM ID %d: %w", ID, err)
 	}
 	updateQuery := `
 		UPDATE FSM
@@ -94,7 +94,7 @@ func (repo *FSMRepository) SetName(ID int64, Name string) error {
 		WHERE UserID = ?`
 	_, err = repo.DB.Exec(updateQuery, Name, ID)
 	if err != nil {
-		return fmt.Errorf("failed to update order %d: %w", ID, err)
+		return fmt.Errorf("failed to update FSM DataName ID %d: %w", ID, err)
 	}
 	return nil
 }
@@ -121,9 +121,9 @@ func (repo *FSMRepository) SetWeight(ID int64, Weight int) error {
 		return fmt.Errorf("cannot save a empty DataWeight")
 	}
 
-	var existingWeight int
-	checkQuery := `SELECT DataWeight FROM FSM WHERE UserID = ?`
-	err := repo.DB.QueryRow(checkQuery, ID).Scan(&existingWeight)
+	var existingID int64
+	checkQuery := `SELECT UserID FROM FSM WHERE UserID = ?`
+	err := repo.DB.QueryRow(checkQuery, ID).Scan(&existingID)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
