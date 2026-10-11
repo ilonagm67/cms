@@ -167,7 +167,7 @@ func (repo *FSMRepository) GetWeight(ID int64) (int, error) {
 }
 
 func (repo *FSMRepository) Delete(ID int64) error {
-	query := `DELETE FROM users WHERE UserID = ?`
+	query := `DELETE FROM FSM WHERE UserID = ?`
 	result, err := repo.DB.Exec(query, ID)
 	if err != nil {
 		return fmt.Errorf("failed to delete FSM ID: %d, %w", ID, err)
