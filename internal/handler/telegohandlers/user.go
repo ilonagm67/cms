@@ -105,11 +105,6 @@ func (handler *UserHandler) HandlePhone(ctx *th.Context, update telego.Update) e
 			return err
 		}
 	case update.Message.Text != "":
-		_, err := strconv.ParseUint(update.Message.Text, 64, 10)
-		if err != nil {
-			SendMessage(ctx, update.Message.Chat.ID, "Введите телефон!", nil)
-			return err
-		}
 		err = handler.FSMService.UserProcessPhone(update.Message.Chat.ID, update.Message.Text)
 		if err != nil {
 			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", nil)
