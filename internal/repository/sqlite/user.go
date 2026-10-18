@@ -89,7 +89,7 @@ func (repo *UserRepository) SetPhone(ID int64, Phone string) error {
 	if errors.Is(err, sql.ErrNoRows) {
 		return fmt.Errorf("User ID: %d Not Found!", ID)
 	}
-	updateQuery := `UPDATE users SET Name = ? WHERE ID = ?`
+	updateQuery := `UPDATE users SET Number = ? WHERE ID = ?`
 	_, err = repo.DB.Exec(updateQuery, Phone, ID)
 	if err != nil {
 		return fmt.Errorf("failed to update user: %w", err)
