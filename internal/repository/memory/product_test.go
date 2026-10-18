@@ -10,7 +10,7 @@ import (
 
 func TestProductAddSuccessfully(t *testing.T) {
 	ProductName := gofakeit.Name()
-	ProductWeight := gofakeit.Number(0, 10)
+	ProductWeight := gofakeit.Number(1, 10)
 	product := &entity.Product{Name: ProductName, Weight: ProductWeight}
 	repo := memory.NewProductRepository()
 	err := repo.Add(product)

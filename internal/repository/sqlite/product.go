@@ -38,7 +38,7 @@ func NewProductRepository() *ProductRepository {
 }
 
 func (repo *ProductRepository) Add(product *entity.Product) error {
-	if Product.Name == "" || Product.Weight == 0 {
+	if product.Name == "" || product.Weight == 0 {
 		return fmt.Errorf("Product Name or Weight Not Found")
 	}
 	var existingName string
@@ -71,7 +71,7 @@ func (repo *ProductRepository) Add(product *entity.Product) error {
 }
 
 func (repo *ProductRepository) Delete(name string, weight int) error {
-	if Product.Name == "" || Product.Weight == 0 {
+	if name == "" || weight == 0 {
 		return fmt.Errorf("Product Name or Weight Not Found")
 	}
 	query := `DELETE FROM products WHERE Name = ? AND Weight = ?`
