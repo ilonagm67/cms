@@ -16,8 +16,8 @@ func NewUserRepository() *UserRepository {
 }
 
 func (repo *UserRepository) Add(ID int64, User *entity.User) error {
-	if User.ID == 0 {
-		return fmt.Errorf("User ID Not Found")
+	if ID == 0 || User.ID == 0 {
+		return fmt.Errorf("ID or User ID Not Found")
 	}
 	repo.users[ID] = User
 	return nil
@@ -48,6 +48,9 @@ func (repo *UserRepository) SetPhone(ID int64, Phone string) error {
 }
 
 func (repo *UserRepository) Delete(ID int64) error {
+	if ID == 0 {
+		return fmt.Errorf("ID not set!")
+	}
 	_, ok := repo.users[ID]
 	if !ok {
 		return fmt.Errorf("User ID: %d Not Found", ID)
@@ -57,6 +60,9 @@ func (repo *UserRepository) Delete(ID int64) error {
 }
 
 func (repo *UserRepository) Get(ID int64) (*entity.User, error) {
+	if ID == 0 {
+		return nil, fmt.Errorf("ID not set!")
+	}
 	user, ok := repo.users[ID]
 	if !ok {
 		return nil, fmt.Errorf("User ID: %d Not Found", ID)

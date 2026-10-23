@@ -29,6 +29,9 @@ func (repo *FSMRepository) Set(ID int64, State entity.State) error {
 }
 
 func (repo *FSMRepository) SetName(ID int64, Name string) error {
+	if ID == 0 || Name == "" {
+		return fmt.Errorf("ID or Name not found!")
+	}
 	_, ok := repo.states[ID]
 	if !ok {
 		return fmt.Errorf("FSM ID: %d Not Found", ID)
@@ -38,6 +41,9 @@ func (repo *FSMRepository) SetName(ID int64, Name string) error {
 }
 
 func (repo *FSMRepository) GetName(ID int64) (string, error) {
+	if ID == 0 {
+		return "", fmt.Errorf("ID not set!")
+	}
 	_, ok := repo.states[ID]
 	if !ok {
 		return "", fmt.Errorf("FSM ID: %d Not Found", ID)
@@ -49,6 +55,9 @@ func (repo *FSMRepository) GetName(ID int64) (string, error) {
 }
 
 func (repo *FSMRepository) SetWeight(ID int64, Weight int) error {
+	if ID == 0 || Weight == 0 {
+		return fmt.Errorf("ID or Weight not found!")
+	}
 	_, ok := repo.states[ID]
 	if !ok {
 		return fmt.Errorf("FSM ID: %d Not Found", ID)
@@ -58,6 +67,9 @@ func (repo *FSMRepository) SetWeight(ID int64, Weight int) error {
 }
 
 func (repo *FSMRepository) GetWeight(ID int64) (int, error) {
+	if ID == 0 {
+		return 0, fmt.Errorf("ID not set!")
+	}
 	_, ok := repo.states[ID]
 	if !ok {
 		return 0, fmt.Errorf("FSM ID: %d Not Found", ID)
@@ -69,6 +81,9 @@ func (repo *FSMRepository) GetWeight(ID int64) (int, error) {
 }
 
 func (repo *FSMRepository) Delete(ID int64) error {
+	if ID == 0 {
+		return fmt.Errorf("ID not set!")
+	}
 	_, ok := repo.states[ID]
 	if !ok {
 		return fmt.Errorf("FSM ID: %d not Found", ID)
@@ -78,9 +93,12 @@ func (repo *FSMRepository) Delete(ID int64) error {
 }
 
 func (repo *FSMRepository) Get(ID int64) (entity.State, error) {
-	fsm, ok := repo.states[ID]
-	if ok {
-		return fsm.State, nil
+	if ID == 0 {
+		return "", fmt.Errorf("ID not set!")
 	}
-	return "", fmt.Errorf("FSM ID: %d Not Found", ID)
+	fsm, ok := repo.states[ID]
+	if !ok {
+		return "", fmt.Errorf("FSM ID: %d Not Found", ID)
+	}
+	return fsm.State, nil
 }

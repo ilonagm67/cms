@@ -29,7 +29,7 @@ func (repo *ProductRepository) Add(Product *entity.Product) error {
 
 func (repo *ProductRepository) Delete(Name string, Weight int) error {
 	if Name == "" || Weight == 0 {
-		return fmt.Errorf("Name or Weight not Permitted!")
+		return fmt.Errorf("Name or Weight not set!")
 	}
 
 	weights, ok := repo.products[Name]
@@ -51,6 +51,9 @@ func (repo *ProductRepository) Delete(Name string, Weight int) error {
 }
 
 func (repo *ProductRepository) Get(Name string, Weight int) (*entity.Product, error) {
+	if Name == "" || Weight == 0 {
+		return nil, fmt.Errorf("Name or Weight not set!")
+	}
 	weights, ok := repo.products[Name]
 	if !ok {
 		return nil, fmt.Errorf("ProductName: %s Not Found!", Name)

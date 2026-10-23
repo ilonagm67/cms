@@ -16,16 +16,16 @@ func NewOrderRepository() *OrderRepository {
 }
 
 func (repo *OrderRepository) Add(ID int64, Order *entity.Order) error {
-	if Order.UserID == 0 {
-		return fmt.Errorf("Order UserID Not Found!")
+	if ID == 0 || Order.UserID == 0 {
+		return fmt.Errorf("ID or Order UserID Not Found!")
 	}
 	repo.orders[ID] = Order
 	return nil
 }
 
 func (repo *OrderRepository) AddProduct(ID int64, Product *entity.Product) error {
-	if Product.Name == "" || Product.Weight == 0 {
-		return fmt.Errorf("Product Name or Weight Not Found")
+	if ID == 0 || Product.Name == "" || Product.Weight == 0 {
+		return fmt.Errorf("ID or Product Name or Product Weight not set!")
 	}
 	if repo.orders[ID].Products == nil {
 		productmap := make(map[string]map[int]*entity.Product)
@@ -40,6 +40,9 @@ func (repo *OrderRepository) AddProduct(ID int64, Product *entity.Product) error
 }
 
 func (repo *OrderRepository) DeleteProduct(ID int64, Name string, Weight int) error {
+	if ID == 0 || Name == "" || Weight == 0 {
+		return fmt.Errorf("ID or Name or Weight not set!")
+	}
 	order, ok := repo.orders[ID]
 	if !ok {
 		return fmt.Errorf("User %d Not Found!", ID)
@@ -65,6 +68,9 @@ func (repo *OrderRepository) DeleteProduct(ID int64, Name string, Weight int) er
 }
 
 func (repo *OrderRepository) Get(ID int64) (*entity.Order, error) {
+	if ID == 0 {
+		return nil, fmt.Errorf("ID not set!")
+	}
 	order, ok := repo.orders[ID]
 	if !ok {
 		return nil, fmt.Errorf("Order Not Found")
@@ -73,8 +79,8 @@ func (repo *OrderRepository) Get(ID int64) (*entity.Order, error) {
 }
 
 func (repo *OrderRepository) List() (map[int64]*entity.Order, error) {
-	if len(repo.orders) > 0 {
-		return repo.orders, nil
+	if len(repo.orders) == 0 {
+		return nil, fmt.Errorf("No Items in Database Orders")
 	}
-	return nil, fmt.Errorf("No Items in Database Orders")
+	return repo.orders, nil
 }
