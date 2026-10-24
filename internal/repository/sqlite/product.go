@@ -39,7 +39,7 @@ func NewProductRepository() *ProductRepository {
 
 func (repo *ProductRepository) Add(product *entity.Product) error {
 	if product.Name == "" || product.Weight == 0 {
-		return fmt.Errorf("Product Name or Weight Not Found")
+		return fmt.Errorf("Product Name or Weight not set!")
 	}
 	var existingName string
 	query := `SELECT Name FROM products WHERE Name = ? AND Weight = ?`
@@ -72,7 +72,7 @@ func (repo *ProductRepository) Add(product *entity.Product) error {
 
 func (repo *ProductRepository) Delete(name string, weight int) error {
 	if name == "" || weight == 0 {
-		return fmt.Errorf("Product Name or Weight Not Found")
+		return fmt.Errorf("Name or Weight not set!")
 	}
 	query := `DELETE FROM products WHERE Name = ? AND Weight = ?`
 
@@ -94,6 +94,9 @@ func (repo *ProductRepository) Delete(name string, weight int) error {
 }
 
 func (repo *ProductRepository) Get(name string, weight int) (*entity.Product, error) {
+	if name == "" || weight == 0 {
+		return nil, fmt.Errorf("Name or Weight not set!")
+	}
 	query := `SELECT Name, Description, Image, Weight, Count, Price FROM products WHERE Name = ? AND Weight = ?`
 
 	var product entity.Product

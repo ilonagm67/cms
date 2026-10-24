@@ -34,8 +34,8 @@ func NewFSMRepository() *FSMRepository {
 }
 
 func (repo *FSMRepository) Set(ID int64, State entity.State) error {
-	if State == "" {
-		return fmt.Errorf("cannot save a empty state")
+	if ID == 0 || State == "" {
+		return fmt.Errorf("ID or State not set!")
 	}
 
 	var existingID int64
@@ -67,8 +67,8 @@ func (repo *FSMRepository) Set(ID int64, State entity.State) error {
 }
 
 func (repo *FSMRepository) SetName(ID int64, Name string) error {
-	if Name == "" {
-		return fmt.Errorf("cannot save a empty DataName")
+	if ID == 0 || Name == "" {
+		return fmt.Errorf("ID or Name not set!")
 	}
 
 	var existingName string
@@ -100,6 +100,9 @@ func (repo *FSMRepository) SetName(ID int64, Name string) error {
 }
 
 func (repo *FSMRepository) GetName(ID int64) (string, error) {
+	if ID == 0 {
+		return "", fmt.Errorf("ID not set!")
+	}
 	query := `
 		SELECT DataName
 		FROM FSM
@@ -117,8 +120,8 @@ func (repo *FSMRepository) GetName(ID int64) (string, error) {
 }
 
 func (repo *FSMRepository) SetWeight(ID int64, Weight int) error {
-	if Weight == 0 {
-		return fmt.Errorf("cannot save a empty DataWeight")
+	if ID == 0 || Weight == 0 {
+		return fmt.Errorf("ID or Weight not set!")
 	}
 
 	var existingWeight int
@@ -150,6 +153,9 @@ func (repo *FSMRepository) SetWeight(ID int64, Weight int) error {
 }
 
 func (repo *FSMRepository) GetWeight(ID int64) (int, error) {
+	if ID == 0 {
+		return 0, fmt.Errorf("ID not set!")
+	}
 	query := `
 		SELECT DataWeight
 		FROM FSM
@@ -167,6 +173,9 @@ func (repo *FSMRepository) GetWeight(ID int64) (int, error) {
 }
 
 func (repo *FSMRepository) Delete(ID int64) error {
+	if ID == 0 {
+		return fmt.Errorf("ID not set!")
+	}
 	query := `DELETE FROM FSM WHERE UserID = ?`
 	result, err := repo.DB.Exec(query, ID)
 	if err != nil {
@@ -184,6 +193,9 @@ func (repo *FSMRepository) Delete(ID int64) error {
 }
 
 func (repo *FSMRepository) Get(ID int64) (entity.State, error) {
+	if ID == 0 {
+		return "", fmt.Errorf("ID not set!")
+	}
 	query := `
 		SELECT State
 		FROM FSM

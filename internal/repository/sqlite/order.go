@@ -37,9 +37,9 @@ func NewOrderRepository() *OrderRepository {
 	return &OrderRepository{DB: db}
 }
 
-func (repo *OrderRepository) Add(customerID int64, order *entity.Order) error {
-	if order == nil {
-		return fmt.Errorf("cannot save a nil order")
+func (repo *OrderRepository) Add(ID int64, order *entity.Order) error {
+	if ID == 0 || order == nil {
+		return fmt.Errorf("ID or order not set!")
 	}
 
 	encodedProducts, err := json.Marshal(order.Products)
@@ -50,69 +50,72 @@ func (repo *OrderRepository) Add(customerID int64, order *entity.Order) error {
 
 	var existingID int64
 	checkQuery := `SELECT CustomerID FROM orders WHERE CustomerID = ?`
-	err = repo.DB.QueryRow(checkQuery, customerID).Scan(&existingID)
+	err = repo.DB.QueryRow(checkQuery, ID).Scan(&existingID)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			insertQuery := `
 				INSERT INTO orders (CustomerID, Products, PayType, Address, Delivery)
 				VALUES (?, ?, ?, ?, ?)`
-			_, err := repo.DB.Exec(insertQuery, customerID, jsonStr, order.PayType, order.Address, order.Delivery)
+			_, err := repo.DB.Exec(insertQuery, ID, jsonStr, order.PayType, order.Address, order.Delivery)
 			if err != nil {
-				return fmt.Errorf("failed to insert order %d: %w", customerID, err)
+				return fmt.Errorf("failed to insert order %d: %w", ID, err)
 			}
 			return nil
 		}
-		return fmt.Errorf("failed to check existing order %d: %w", customerID, err)
+		return fmt.Errorf("failed to check existing order %d: %w", ID, err)
 	}
 
 	updateQuery := `
 		UPDATE orders
 		SET Products = ?, PayType = ?, Address = ?, Delivery = ?
 		WHERE CustomerID = ?`
-	_, err = repo.DB.Exec(updateQuery, jsonStr, order.PayType, order.Address, order.Delivery, customerID)
+	_, err = repo.DB.Exec(updateQuery, jsonStr, order.PayType, order.Address, order.Delivery, ID)
 	if err != nil {
-		return fmt.Errorf("failed to update order %d: %w", customerID, err)
+		return fmt.Errorf("failed to update order %d: %w", ID, err)
 	}
 
 	return nil
 }
 
-func (repo *OrderRepository) DeleteProduct(customerID int64, product string, weight int) error {
+func (repo *OrderRepository) DeleteProduct(ID int64, name string, weight int) error {
+	if ID == 0 || name == "" || weight == 0 {
+		return fmt.Errorf("ID or name or weight not set!")
+	}
 	query := `
 		SELECT Products 
 		FROM orders 
 		WHERE CustomerID = ?`
 	var jsonBytes []byte
 
-	err := repo.DB.QueryRow(query, customerID).Scan(&jsonBytes)
+	err := repo.DB.QueryRow(query, ID).Scan(&jsonBytes)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return fmt.Errorf("order for customer %d not found", customerID)
+			return fmt.Errorf("order for customer %d not found", ID)
 		}
-		return fmt.Errorf("failed to fetch order %d: %w", customerID, err)
+		return fmt.Errorf("failed to fetch order %d: %w", ID, err)
 	}
 
 	var products map[string]map[int]*entity.Product
 	if len(jsonBytes) > 0 {
 		if err := json.Unmarshal(jsonBytes, &products); err != nil {
-			return fmt.Errorf("failed to unmarshal products for customer %d: %w", customerID, err)
+			return fmt.Errorf("failed to unmarshal products for customer %d: %w", ID, err)
 		}
 	}
 
-	weights, productExists := products[product]
+	weights, productExists := products[name]
 	if !productExists {
-		return fmt.Errorf("product category %q not found for customer %d", product, customerID)
+		return fmt.Errorf("product category %q not found for customer %d", name, ID)
 	}
 
 	if _, weightExists := weights[weight]; !weightExists {
-		return fmt.Errorf("weight %d not found under product %q", weight, product)
+		return fmt.Errorf("weight %d not found under product %q", weight, name)
 	}
 
 	delete(weights, weight)
 
 	if len(weights) == 0 {
-		delete(products, product)
+		delete(products, name)
 	}
 
 	updatedJSON, err := json.Marshal(products)
@@ -124,14 +127,17 @@ func (repo *OrderRepository) DeleteProduct(customerID int64, product string, wei
 		UPDATE orders 
 		SET Products = ? 
 		WHERE CustomerID = ?`
-	if _, err := repo.DB.Exec(updateQuery, string(updatedJSON), customerID); err != nil {
-		return fmt.Errorf("failed to update order %d after deletion: %w", customerID, err)
+	if _, err := repo.DB.Exec(updateQuery, string(updatedJSON), ID); err != nil {
+		return fmt.Errorf("failed to update order %d after deletion: %w", ID, err)
 	}
 
 	return nil
 }
 
 func (repo *OrderRepository) Get(ID int64) (*entity.Order, error) {
+	if ID == 0 {
+		return nil, fmt.Errorf("ID not set!")
+	}
 	query := `
 		SELECT CustomerID, Products, PayType, Address, Delivery 
 		FROM orders 
