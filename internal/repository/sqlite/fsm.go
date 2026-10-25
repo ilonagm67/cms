@@ -71,7 +71,7 @@ func (repo *FSMRepository) SetName(ID int64, Name string) error {
 		return fmt.Errorf("ID or Name not set!")
 	}
 
-	var existingName string
+	var existingName *string
 	checkQuery := `SELECT DataName FROM FSM WHERE UserID = ?`
 	err := repo.DB.QueryRow(checkQuery, ID).Scan(&existingName)
 
@@ -82,11 +82,11 @@ func (repo *FSMRepository) SetName(ID int64, Name string) error {
 				VALUES (?, ?)`
 			_, err := repo.DB.Exec(insertQuery, ID, Name)
 			if err != nil {
-				return fmt.Errorf("failed to insert order %d: %w", ID, err)
+				return fmt.Errorf("failed to insert fsm dataname %d: %w", ID, err)
 			}
 			return nil
 		}
-		return fmt.Errorf("failed to check existing order %d: %w", ID, err)
+		return fmt.Errorf("failed to check existing fsm %d: %w", ID, err)
 	}
 	updateQuery := `
 		UPDATE FSM
@@ -94,7 +94,7 @@ func (repo *FSMRepository) SetName(ID int64, Name string) error {
 		WHERE UserID = ?`
 	_, err = repo.DB.Exec(updateQuery, Name, ID)
 	if err != nil {
-		return fmt.Errorf("failed to update order %d: %w", ID, err)
+		return fmt.Errorf("failed to update dataname %d: %w", ID, err)
 	}
 	return nil
 }
