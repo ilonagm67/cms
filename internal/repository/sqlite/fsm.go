@@ -124,7 +124,7 @@ func (repo *FSMRepository) SetWeight(ID int64, Weight int) error {
 		return fmt.Errorf("ID or Weight not set!")
 	}
 
-	var existingWeight int
+	var existingWeight *int
 	checkQuery := `SELECT DataWeight FROM FSM WHERE UserID = ?`
 	err := repo.DB.QueryRow(checkQuery, ID).Scan(&existingWeight)
 
