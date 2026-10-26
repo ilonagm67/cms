@@ -63,7 +63,7 @@ func (repo *ProductRepository) Add(product *entity.Product) error {
 		return nil
 	}
 	updateQuery := `UPDATE products SET Name = ?, Description = ?, Image = ?, Weight = ?, Count = ?,Price = ? WHERE Name = ? AND Weight = ?`
-	_, err = repo.DB.Exec(updateQuery, product.Name, product.Description, product.Image, product.Weight, product.Count, product.Price, product.Name)
+	_, err = repo.DB.Exec(updateQuery, product.Name, product.Description, product.Image, product.Weight, product.Count, product.Price, product.Name, product.Weight)
 	if err != nil {
 		return fmt.Errorf("failed to update product: %w", err)
 	}
