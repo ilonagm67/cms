@@ -138,7 +138,10 @@ func (repo *UserRepository) Get(ID int64) (*entity.User, error) {
 }
 
 func (repo *UserRepository) List() (map[int64]*entity.User, error) {
-	rows, _ := repo.DB.Query("SELECT ID,Name,Number FROM users")
+	rows, err := repo.DB.Query("SELECT ID, Name, Number FROM users")
+	if err != nil {
+		return nil, err
+	}
 	result := make(map[int64]*entity.User)
 	for rows.Next() {
 		var user entity.User
