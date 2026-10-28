@@ -3,7 +3,7 @@ package usecase
 import "cms/internal/entity"
 
 type UserRepository interface {
-	Add(ID int64, User *entity.User) error
+	Add(ID int64) error
 	SetName(ID int64, Name string) error
 	SetPhone(ID int64, Phone string) error
 	Delete(ID int64) error

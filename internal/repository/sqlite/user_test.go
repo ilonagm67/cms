@@ -1,7 +1,6 @@
 package sqlite
 
 import (
-	"cms/internal/entity"
 	"database/sql"
 	"errors"
 	"testing"
@@ -12,7 +11,6 @@ import (
 
 func TestUserAddSuccessfull(t *testing.T) {
 	ID := gofakeit.Int64()
-	User := gofakeit.Name()
 
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -21,18 +19,18 @@ func TestUserAddSuccessfull(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectQuery("SELECT ID FROM users").WithArgs(ID).WillReturnError(sql.ErrNoRows)
-	mock.ExpectExec("INSERT INTO users").WithArgs(ID, User, "1").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("INSERT INTO users").WithArgs(ID).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	repo := UserRepository{DB: db}
-	err = repo.Add(ID, &entity.User{ID: ID, Name: User, Number: "1"})
+	err = repo.Add(ID)
 	if err != nil {
 		t.Errorf("Test User Add return error: %v", err)
 	}
 }
 
 func TestUserAddError(t *testing.T) {
-	ID := gofakeit.Int64()
-	User := gofakeit.Name()
+	var ID int64
+	ID = 0
 
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -41,10 +39,10 @@ func TestUserAddError(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectQuery("SELECT ID FROM users").WithArgs(ID).WillReturnError(sql.ErrNoRows)
-	mock.ExpectExec("INSERT INTO users").WithArgs(ID, User).WillReturnError(errors.New("error"))
+	mock.ExpectExec("INSERT INTO users").WithArgs(ID).WillReturnError(errors.New("error"))
 
 	repo := UserRepository{DB: db}
-	err = repo.Add(ID, &entity.User{ID: ID, Name: User})
+	err = repo.Add(ID)
 	if err == nil {
 		t.Errorf("Test User Add return nil: %v", err)
 	}
@@ -53,7 +51,6 @@ func TestUserAddError(t *testing.T) {
 func TestUserSetNameSuccessfully(t *testing.T) {
 	ID := gofakeit.Int64()
 	Name := gofakeit.Name()
-	Phone := "1"
 
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -62,11 +59,11 @@ func TestUserSetNameSuccessfully(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectQuery("SELECT ID FROM users").WithArgs(ID).WillReturnError(sql.ErrNoRows)
-	mock.ExpectExec("INSERT INTO users").WithArgs(ID, Name, Phone).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("INSERT INTO users").WithArgs(ID).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectExec("UPDATE users").WithArgs(Name, ID).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	repo := UserRepository{DB: db}
-	err = repo.Add(ID, &entity.User{ID: ID, Name: Name, Number: Phone})
+	err = repo.Add(ID)
 	if err != nil {
 		t.Errorf("Test Update Name User Add return error: %v", err)
 	}
@@ -98,7 +95,6 @@ func TestUserSetNameError(t *testing.T) {
 
 func TestUserSetPhoneSuccessfully(t *testing.T) {
 	ID := gofakeit.Int64()
-	Name := gofakeit.Name()
 	Phone := "1"
 
 	db, mock, err := sqlmock.New()
@@ -108,11 +104,11 @@ func TestUserSetPhoneSuccessfully(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectQuery("SELECT ID FROM users").WithArgs(ID).WillReturnError(sql.ErrNoRows)
-	mock.ExpectExec("INSERT INTO users").WithArgs(ID, Name, Phone).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("INSERT INTO users").WithArgs(ID).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectExec("UPDATE users").WithArgs(Phone, ID).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	repo := UserRepository{DB: db}
-	err = repo.Add(ID, &entity.User{ID: ID, Name: Name, Number: Phone})
+	err = repo.Add(ID)
 	if err != nil {
 		t.Errorf("Test Update Name User Add return error: %v", err)
 	}
@@ -144,8 +140,6 @@ func TestUserSetPhoneError(t *testing.T) {
 
 func TestUserDeleteSuccessfully(t *testing.T) {
 	ID := gofakeit.Int64()
-	Name := gofakeit.Name()
-	Phone := "1"
 
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -154,11 +148,11 @@ func TestUserDeleteSuccessfully(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectQuery("SELECT ID FROM users").WithArgs(ID).WillReturnError(sql.ErrNoRows)
-	mock.ExpectExec("INSERT INTO users").WithArgs(ID, Name, Phone).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("INSERT INTO users").WithArgs(ID).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectExec("DELETE FROM users").WithArgs(ID).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	repo := UserRepository{DB: db}
-	err = repo.Add(ID, &entity.User{ID: ID, Name: Name, Number: Phone})
+	err = repo.Add(ID)
 	if err != nil {
 		t.Errorf("Test Delete User Add return error: %v", err)
 	}
@@ -199,12 +193,22 @@ func TestUserGetSuccessfully(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectQuery("SELECT ID FROM users").WithArgs(ID).WillReturnError(sql.ErrNoRows)
-	mock.ExpectExec("INSERT INTO users").WithArgs(ID, Name, Phone).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("INSERT INTO users ").WithArgs(ID).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("UPDATE users ").WithArgs(Name, ID).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("UPDATE users ").WithArgs(Phone, ID).WillReturnResult(sqlmock.NewResult(1, 1))
 	rows := sqlmock.NewRows([]string{"id", "name", "number"}).AddRow(ID, Name, Phone)
 	mock.ExpectQuery("SELECT ID, Name, Number FROM users WHERE ID = ?").WithArgs(ID).WillReturnRows(rows)
 
 	repo := UserRepository{DB: db}
-	err = repo.Add(ID, &entity.User{ID: ID, Name: Name, Number: Phone})
+	err = repo.Add(ID)
+	if err != nil {
+		t.Errorf("Test Get User Add return error: %v", err)
+	}
+	err = repo.SetName(ID, Name)
+	if err != nil {
+		t.Errorf("Test Get User Add return error: %v", err)
+	}
+	err = repo.SetPhone(ID, Phone)
 	if err != nil {
 		t.Errorf("Test Get User Add return error: %v", err)
 	}
@@ -244,14 +248,24 @@ func TestUserListSuccessfully(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectQuery("SELECT ID FROM users").WithArgs(ID).WillReturnError(sql.ErrNoRows)
-	mock.ExpectExec("INSERT INTO users").WithArgs(ID, Name, Phone).WillReturnResult(sqlmock.NewResult(1, 1))
-	rows := sqlmock.NewRows([]string{"id", "name", "number"}).AddRow(ID, Name, Phone)
+	mock.ExpectExec("INSERT INTO users").WithArgs(ID).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("UPDATE users").WithArgs(Name, ID).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("UPDATE users").WithArgs(Phone, ID).WillReturnResult(sqlmock.NewResult(1, 1))
+	rows := sqlmock.NewRows([]string{"id"}).AddRow(ID)
 	mock.ExpectQuery("SELECT ID, Name, Number FROM users").WillReturnRows(rows)
 
 	repo := UserRepository{DB: db}
-	err = repo.Add(ID, &entity.User{ID: ID, Name: Name, Number: Phone})
+	err = repo.Add(ID)
 	if err != nil {
 		t.Errorf("Test List User Add return error: %v", err)
+	}
+	err = repo.SetName(ID, Name)
+	if err != nil {
+		t.Errorf("Test Get User Add return error: %v", err)
+	}
+	err = repo.SetPhone(ID, Phone)
+	if err != nil {
+		t.Errorf("Test Get User Add return error: %v", err)
 	}
 	_, err = repo.List()
 	if err != nil {

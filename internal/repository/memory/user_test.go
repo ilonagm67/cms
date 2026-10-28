@@ -1,7 +1,6 @@
 package memory_test
 
 import (
-	"cms/internal/entity"
 	"cms/internal/repository/memory"
 	"testing"
 
@@ -10,18 +9,18 @@ import (
 
 func TestUserAddSuccessfull(t *testing.T) {
 	ID := gofakeit.Int64()
-	User := gofakeit.Name()
 	repo := memory.NewUserRepository()
-	err := repo.Add(ID, &entity.User{ID: ID, Name: User})
+	err := repo.Add(ID)
 	if err != nil {
 		t.Errorf("Test User Add return error")
 	}
 }
 
 func TestUserAddError(t *testing.T) {
-	ID := gofakeit.Int64()
+	var ID int64
+	ID = 0
 	repo := memory.NewUserRepository()
-	err := repo.Add(ID, &entity.User{})
+	err := repo.Add(ID)
 	if err == nil {
 		t.Errorf("Test Repo Add return nil")
 	}
@@ -31,7 +30,7 @@ func TestUserSetNameSuccessfull(t *testing.T) {
 	ID := gofakeit.Int64()
 	User := gofakeit.Name()
 	repo := memory.NewUserRepository()
-	err := repo.Add(ID, &entity.User{ID: ID})
+	err := repo.Add(ID)
 	if err != nil {
 		t.Errorf("Test SetName UserAdd return error")
 	}
@@ -55,7 +54,7 @@ func TestUserSetPhoneSuccessfull(t *testing.T) {
 	ID := gofakeit.Int64()
 	Phone := gofakeit.Phone()
 	repo := memory.NewUserRepository()
-	err := repo.Add(ID, &entity.User{ID: ID})
+	err := repo.Add(ID)
 	if err != nil {
 		t.Errorf("Test SetName UserAdd return error")
 	}
@@ -77,9 +76,8 @@ func TestUserSetPhoneError(t *testing.T) {
 
 func TestUserDeleteSuccessfull(t *testing.T) {
 	ID := gofakeit.Int64()
-	User := &entity.User{ID: ID}
 	repo := memory.NewUserRepository()
-	err := repo.Add(ID, User)
+	err := repo.Add(ID)
 	if err != nil {
 		t.Errorf("Test Repo Delete useradd return error")
 	}
@@ -100,9 +98,8 @@ func TestUserDeleteError(t *testing.T) {
 
 func TestUserGetSuccessfull(t *testing.T) {
 	ID := gofakeit.Int64()
-	User := &entity.User{ID: ID}
 	repo := memory.NewUserRepository()
-	err := repo.Add(ID, User)
+	err := repo.Add(ID)
 	if err != nil {
 		t.Errorf("Test Repo Get useradd return error")
 	}
@@ -123,9 +120,8 @@ func TestUserGetError(t *testing.T) {
 
 func TestUserListSuccessfull(t *testing.T) {
 	ID := gofakeit.Int64()
-	User := &entity.User{ID: ID}
 	repo := memory.NewUserRepository()
-	err := repo.Add(ID, User)
+	err := repo.Add(ID)
 	if err != nil {
 		t.Errorf("Test Repo List useradd return error")
 	}

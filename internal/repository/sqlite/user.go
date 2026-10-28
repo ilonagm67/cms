@@ -34,17 +34,17 @@ func NewUserRepository() *UserRepository {
 	return &UserRepository{DB: db}
 }
 
-func (repo *UserRepository) Add(ID int64, User *entity.User) error {
-	if ID == 0 || User == nil {
-		return fmt.Errorf("ID or User not set!")
+func (repo *UserRepository) Add(ID int64) error {
+	if ID == 0 {
+		return fmt.Errorf("ID not set!")
 	}
 	var existingID int64
 	query := `SELECT ID FROM users WHERE ID = ?`
 	err := repo.DB.QueryRow(query, ID).Scan(&existingID)
 
 	if errors.Is(err, sql.ErrNoRows) {
-		insertQuery := `INSERT INTO users (ID,Name,Number) VALUES (?,?,?)`
-		_, err := repo.DB.Exec(insertQuery, ID, User.Name, User.Number)
+		insertQuery := `INSERT INTO users (ID) VALUES (?)`
+		_, err := repo.DB.Exec(insertQuery, ID)
 		if err != nil {
 			return fmt.Errorf("failed to insert user: %w", err)
 		}
@@ -52,13 +52,6 @@ func (repo *UserRepository) Add(ID int64, User *entity.User) error {
 	} else if err != nil {
 		return fmt.Errorf("failed to check existing user: %w", err)
 	}
-
-	updateQuery := `UPDATE users SET Name = ?, Number = ? WHERE ID = ?`
-	_, err = repo.DB.Exec(updateQuery, User.Name, User.Number, ID)
-	if err != nil {
-		return fmt.Errorf("failed to update user: %w", err)
-	}
-
 	return nil
 }
 

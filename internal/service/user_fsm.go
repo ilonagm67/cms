@@ -1,7 +1,5 @@
 package service
 
-import "cms/internal/entity"
-
 func (Service *FSMService) UserQuestionStart(id int64) error {
 	Service.FSMRepo.Set(id, "user_question")
 	return nil
@@ -16,7 +14,7 @@ func (Service *FSMService) UserQuestionProcess(id int64) error {
 }
 
 func (Service *FSMService) UserStart(id int64) error {
-	err := Service.UserRepo.Add(id, &entity.User{ID: id})
+	err := Service.UserRepo.Add(id)
 	if err != nil {
 		return err
 	}

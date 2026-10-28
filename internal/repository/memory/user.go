@@ -15,11 +15,11 @@ func NewUserRepository() *UserRepository {
 	}
 }
 
-func (repo *UserRepository) Add(ID int64, User *entity.User) error {
-	if ID == 0 || User.ID == 0 {
-		return fmt.Errorf("ID or User ID Not Found")
+func (repo *UserRepository) Add(ID int64) error {
+	if ID == 0 {
+		return fmt.Errorf("ID Not Found")
 	}
-	repo.users[ID] = User
+	repo.users[ID] = &entity.User{ID: ID}
 	return nil
 }
 
