@@ -2,14 +2,14 @@ pipeline {
 	agent { label "dev" }
 	tools { go "go-1.27.1" }
 	stages {
-		stage("Download dependency") {
+		stage("Package Download") {
 			steps {
 				sh "go mod tidy"
 			}
 		}
 		stage("Test") {
 			steps {
-				sh "go test -count=1 -coverprofile -v ./..."
+				sh "go test -cover ./..."
 			}
 		}
 		stage("Build") {
