@@ -13,7 +13,7 @@ job "cms" {
       shutdown_delay = "5s"
       driver = "docker"
       config {
-        image = "vangdevops/cms:v0.3.3-beta"
+        image = "vangdevops/cms:v0.3.4-beta"
         args = ["-memory","-verbose"]
       }
       template {
