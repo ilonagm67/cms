@@ -8,6 +8,7 @@ import (
 	"cms/internal/route/http"
 	"cms/internal/route/tg"
 	"cms/internal/service"
+	"cms/internal/service/fsm"
 	"flag"
 )
 
@@ -26,7 +27,7 @@ func main() {
 			productrepo := memory.NewProductRepository()
 			userrepo := memory.NewUserRepository()
 
-			fsmservice := service.NewFSMService(fsmrepo, orderrepo, productrepo, userrepo)
+			fsmservice := fsm.NewFSMService(fsmrepo, orderrepo, productrepo, userrepo)
 			orderservice := service.NewOrderService(orderrepo)
 			productservice := service.NewProductService(productrepo)
 			userservice := service.NewUserService(userrepo)
@@ -51,7 +52,7 @@ func main() {
 			productrepo := sqlite.NewProductRepository()
 			userrepo := sqlite.NewUserRepository()
 
-			fsmservice := service.NewFSMService(fsmrepo, orderrepo, productrepo, userrepo)
+			fsmservice := fsm.NewFSMService(fsmrepo, orderrepo, productrepo, userrepo)
 			orderservice := service.NewOrderService(orderrepo)
 			productservice := service.NewProductService(productrepo)
 			userservice := service.NewUserService(userrepo)
@@ -80,7 +81,7 @@ func main() {
 			productrepo := memory.NewProductRepository()
 			userrepo := memory.NewUserRepository()
 
-			fsmservice := service.NewFSMService(fsmrepo, orderrepo, productrepo, userrepo)
+			fsmservice := fsm.NewFSMService(fsmrepo, orderrepo, productrepo, userrepo)
 			orderservice := service.NewOrderService(orderrepo)
 			productservice := service.NewProductService(productrepo)
 			userservice := service.NewUserService(userrepo)
@@ -105,7 +106,7 @@ func main() {
 			productrepo := sqlite.NewProductRepository()
 			userrepo := sqlite.NewUserRepository()
 
-			fsmservice := service.NewFSMService(fsmrepo, orderrepo, productrepo, userrepo)
+			fsmservice := fsm.NewFSMService(fsmrepo, orderrepo, productrepo, userrepo)
 			orderservice := service.NewOrderService(orderrepo)
 			productservice := service.NewProductService(productrepo)
 			userservice := service.NewUserService(userrepo)

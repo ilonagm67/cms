@@ -2,6 +2,7 @@ package telegohandlers
 
 import (
 	"cms/internal/service"
+	"cms/internal/service/fsm"
 	"errors"
 	"fmt"
 	"strconv"
@@ -12,12 +13,12 @@ import (
 )
 
 type OrderHandler struct {
-	FSMService     *service.FSMService
+	FSMService     *fsm.FSMService
 	OrderService   *service.OrderService
 	ProductService *service.ProductService
 }
 
-func NewOrderHandler(FSMService *service.FSMService, ProductService *service.ProductService, OrderService *service.OrderService) *OrderHandler {
+func NewOrderHandler(FSMService *fsm.FSMService, ProductService *service.ProductService, OrderService *service.OrderService) *OrderHandler {
 	return &OrderHandler{FSMService: FSMService, ProductService: ProductService, OrderService: OrderService}
 }
 
@@ -43,12 +44,44 @@ func (handler *OrderHandler) HandleStart(ctx *th.Context, update telego.Update) 
 	if len(row) > 0 {
 		rows = append(rows, row)
 	}
+	row = tu.KeyboardRow(tu.KeyboardButton("🔙Назад"))
+	rows = append(rows, row)
 	keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
 	SendMessage(ctx, update.Message.Chat.ID, "Выберите Продукты:", keyboard)
 	return nil
 }
 
 func (handler *OrderHandler) HandleOrderProducts(ctx *th.Context, update telego.Update) error {
+	if update.Message.Text == "🔙Назад" {
+		order, err := handler.OrderService.Get(update.Message.Chat.ID)
+		if err != nil {
+			SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+			return err
+		}
+		if len(order.Products) > 0 {
+			err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
+			if err != nil {
+				SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+				return err
+			}
+			products, err := handler.OrderService.String(update.Message.Chat.ID)
+			if err != nil {
+				SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+				return err
+			}
+			SendMessage(ctx, update.Message.Chat.ID, products, nil)
+			SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию:", PreDeliveryKeyboard)
+			return nil
+		} else {
+			err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
+			if err != nil {
+				SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+				return err
+			}
+			SendMessage(ctx, update.Message.Chat.ID, "Главное меню", MainKeyboard)
+			return nil
+		}
+	}
 	err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
 	if err != nil {
 		SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
@@ -202,6 +235,8 @@ func (handler *OrderHandler) HandleOrderPreDelivery(ctx *th.Context, update tele
 		if len(row) > 0 {
 			rows = append(rows, row)
 		}
+		row = tu.KeyboardRow(tu.KeyboardButton("🔙Назад"))
+		rows = append(rows, row)
 		keyboard := tu.Keyboard(rows...).WithResizeKeyboard().WithOneTimeKeyboard()
 		SendMessage(ctx, update.Message.Chat.ID, "Выберите товар:", keyboard)
 		return nil

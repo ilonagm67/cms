@@ -3,6 +3,10 @@ package service
 import (
 	"cms/internal/entity"
 	"cms/internal/usecase"
+	"io"
+	"net/http"
+	"os"
+	"path"
 )
 
 type ProductService struct {
@@ -35,4 +39,32 @@ func (Service *ProductService) List() (map[string]map[int]*entity.Product, error
 		return nil, err
 	}
 	return list, nil
+}
+
+func (Service *ProductService) DownloadImage(URL, Folder, Unique string) (string, error) {
+	resp, err := http.Get(URL)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = os.ReadDir(Folder)
+	if err != nil {
+		err = os.Mkdir(Folder, 0755)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	filepath := path.Join(Folder, Unique+".jpg")
+	out, err := os.Create(filepath)
+	if err != nil {
+		return "", err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return filepath, nil
 }

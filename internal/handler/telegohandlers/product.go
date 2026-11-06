@@ -2,6 +2,7 @@ package telegohandlers
 
 import (
 	"cms/internal/service"
+	"cms/internal/service/fsm"
 	"fmt"
 	"os"
 	"strconv"
@@ -12,11 +13,11 @@ import (
 )
 
 type ProductHandler struct {
-	FSMService     *service.FSMService
+	FSMService     *fsm.FSMService
 	ProductService *service.ProductService
 }
 
-func NewProductHandler(FSMService *service.FSMService, ProductService *service.ProductService) *ProductHandler {
+func NewProductHandler(FSMService *fsm.FSMService, ProductService *service.ProductService) *ProductHandler {
 	return &ProductHandler{FSMService: FSMService, ProductService: ProductService}
 }
 
@@ -303,7 +304,7 @@ func (handler *ProductHandler) HandleCatalogAddImage(ctx *th.Context, update tel
 		if len(photos) > 0 {
 			bestPhoto := photos[len(photos)-1]
 
-			file, err := DownloadImage(ctx, "data/photo", bestPhoto.FileID, bestPhoto.FileUniqueID)
+			file, err := handler.DownloadImage(ctx, "data/photo", bestPhoto.FileID, bestPhoto.FileUniqueID)
 			if err != nil {
 				SendMessage(ctx, chatID, "Произошла ошибка", MainKeyboard)
 				return err
@@ -337,4 +338,20 @@ func (handler *ProductHandler) HandleCatalogAddPrice(ctx *th.Context, update tel
 	}
 	SendMessage(ctx, update.Message.Chat.ID, "Товар создан!", MainKeyboard)
 	return nil
+}
+
+func (handler *ProductHandler) DownloadImage(ctx *th.Context, Folder, ID, Unique string) (string, error) {
+	file, err := ctx.Bot().GetFile(ctx, &telego.GetFileParams{
+		FileID: ID,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	URL := ctx.Bot().FileDownloadURL(file.FilePath)
+	filepath, err := handler.ProductService.DownloadImage(URL, Folder, Unique)
+	if err != nil {
+		return "", err
+	}
+	return filepath, nil
 }

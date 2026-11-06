@@ -37,36 +37,102 @@ func NewProductRepository() *ProductRepository {
 	return &ProductRepository{DB: db}
 }
 
-func (repo *ProductRepository) Add(product *entity.Product) error {
-	if product.Name == "" || product.Weight == 0 {
-		return fmt.Errorf("Product Name or Weight not set!")
+func (repo *ProductRepository) Add(name string, weight int) error {
+	if name == "" || weight == 0 {
+		return fmt.Errorf("Name or Weight not set!")
 	}
 	var existingName string
 	query := `SELECT Name FROM products WHERE Name = ? AND Weight = ?`
-	err := repo.DB.QueryRow(query, product.Name, product.Weight).Scan(&existingName)
+	err := repo.DB.QueryRow(query, name, weight).Scan(&existingName)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		query := `
-		INSERT INTO products (Name, Description, Image, Weight, Count, Price)
-		VALUES (?, ?, ?, ?, ?, ?)`
+		INSERT INTO products (Name, Weight)
+		VALUES (?, ?)`
 		_, err := repo.DB.Exec(query,
-			product.Name,
-			product.Description,
-			product.Image,
-			product.Weight,
-			product.Count,
-			product.Price,
+			name,
+			weight,
 		)
 		if err != nil {
-			return fmt.Errorf("failed to insert product %s: %w", product.Name, err)
+			return fmt.Errorf("failed to insert product %s: %w", name, err)
 		}
 		return nil
 	}
-	updateQuery := `UPDATE products SET Name = ?, Description = ?, Image = ?, Weight = ?, Count = ?,Price = ? WHERE Name = ? AND Weight = ?`
-	_, err = repo.DB.Exec(updateQuery, product.Name, product.Description, product.Image, product.Weight, product.Count, product.Price, product.Name, product.Weight)
-	if err != nil {
-		return fmt.Errorf("failed to update product: %w", err)
+	return nil
+}
+
+func (repo *ProductRepository) SetDescription(name string, weight int, description string) error {
+	if name == "" || weight == 0 {
+		return fmt.Errorf("Name or Weight not set!")
 	}
+	if description == "" {
+		return fmt.Errorf("Description not found!")
+	}
+	var existingName string
+	query := `SELECT Name FROM products WHERE Name = ? AND Weight = ?`
+	err := repo.DB.QueryRow(query, name, weight).Scan(&existingName)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("Product not found!")
+	}
+
+	updateQuery := `UPDATE products SET Description = ?, WHERE Name = ? AND Weight = ?`
+	_, err = repo.DB.Exec(updateQuery, description, name, weight)
+
+	if err != nil {
+		return fmt.Errorf("failed to update product: %v", err)
+	}
+
+	return nil
+}
+
+func (repo *ProductRepository) SetImage(name string, weight int, image string) error {
+	if name == "" || weight == 0 {
+		return fmt.Errorf("Name or Weight not set!")
+	}
+	if image == "" {
+		return fmt.Errorf("Image not set!")
+	}
+	var existingName string
+	query := `SELECT Name FROM products WHERE Name = ? AND Weight = ?`
+	err := repo.DB.QueryRow(query, name, weight).Scan(&existingName)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("Product not found!")
+	}
+
+	updateQuery := `UPDATE products SET Image = ?, WHERE Name = ? AND Weight = ?`
+	_, err = repo.DB.Exec(updateQuery, image, name, weight)
+
+	if err != nil {
+		return fmt.Errorf("failed to update product: %v", err)
+	}
+
+	return nil
+}
+
+func (repo *ProductRepository) SetPrice(name string, weight int, price int) error {
+	if name == "" || weight == 0 {
+		return fmt.Errorf("Name or Weight not set!")
+	}
+	if price == 0 {
+		return fmt.Errorf("Price not set!")
+	}
+	var existingName string
+	query := `SELECT Name FROM products WHERE Name = ? AND Weight = ?`
+	err := repo.DB.QueryRow(query, name, weight).Scan(&existingName)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("Product not found!")
+	}
+
+	updateQuery := `UPDATE products SET Price = ?, WHERE Name = ? AND Weight = ?`
+	_, err = repo.DB.Exec(updateQuery, price, name, weight)
+
+	if err != nil {
+		return fmt.Errorf("failed to update product: %v", err)
+	}
+
 	return nil
 }
 

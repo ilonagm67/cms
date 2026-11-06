@@ -1,4 +1,4 @@
-package service
+package fsm
 
 import (
 	"cms/internal/entity"
@@ -137,7 +137,7 @@ func (Service *FSMService) ProductAddingWeight(id int64, weight int) error {
 		Service.FSMRepo.Delete(id)
 		return err
 	}
-	err = Service.ProductRepo.Add(&entity.Product{Name: name, Weight: weight})
+	err = Service.ProductRepo.Add(name, weight)
 	if err != nil {
 		Service.FSMRepo.Delete(id)
 		return err
@@ -157,13 +157,7 @@ func (Service *FSMService) ProductAddingDescription(id int64, text string) error
 		Service.FSMRepo.Delete(id)
 		return err
 	}
-	product, err := Service.ProductRepo.Get(name, weight)
-	if err != nil {
-		Service.FSMRepo.Delete(id)
-		return err
-	}
-	product.Description = text
-	err = Service.ProductRepo.Add(product)
+	err = Service.ProductRepo.SetDescription(name, weight, text)
 	if err != nil {
 		Service.FSMRepo.Delete(id)
 		return err
@@ -183,13 +177,7 @@ func (Service *FSMService) ProductAddingImage(id int64, text string) error {
 		Service.FSMRepo.Delete(id)
 		return err
 	}
-	product, err := Service.ProductRepo.Get(name, weight)
-	if err != nil {
-		Service.FSMRepo.Delete(id)
-		return err
-	}
-	product.Image = text
-	err = Service.ProductRepo.Add(product)
+	err = Service.ProductRepo.SetImage(name, weight, text)
 	if err != nil {
 		Service.FSMRepo.Delete(id)
 		return err
@@ -209,13 +197,7 @@ func (Service *FSMService) ProductAddingPrice(id int64, price int) error {
 		Service.FSMRepo.Delete(id)
 		return err
 	}
-	product, err := Service.ProductRepo.Get(name, weight)
-	if err != nil {
-		Service.FSMRepo.Delete(id)
-		return err
-	}
-	product.Price = price
-	err = Service.ProductRepo.Add(product)
+	err = Service.ProductRepo.SetPrice(name, weight, price)
 	if err != nil {
 		Service.FSMRepo.Delete(id)
 		return err

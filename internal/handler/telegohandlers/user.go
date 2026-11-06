@@ -2,6 +2,7 @@ package telegohandlers
 
 import (
 	"cms/internal/service"
+	"cms/internal/service/fsm"
 	"context"
 	"os"
 	"strconv"
@@ -11,11 +12,11 @@ import (
 )
 
 type UserHandler struct {
-	FSMService  *service.FSMService
+	FSMService  *fsm.FSMService
 	UserService *service.UserService
 }
 
-func NewUserHandler(FSMService *service.FSMService, UserService *service.UserService) *UserHandler {
+func NewUserHandler(FSMService *fsm.FSMService, UserService *service.UserService) *UserHandler {
 	return &UserHandler{FSMService: FSMService, UserService: UserService}
 }
 

@@ -11,9 +11,8 @@ import (
 func TestProductAddSuccessfully(t *testing.T) {
 	ProductName := gofakeit.Name()
 	ProductWeight := gofakeit.Number(1, 10)
-	product := &entity.Product{Name: ProductName, Weight: ProductWeight}
 	repo := memory.NewProductRepository()
-	err := repo.Add(product)
+	err := repo.Add(ProductName, ProductWeight)
 	if err != nil {
 		t.Errorf("Test Product Add Return Error")
 	}
@@ -22,7 +21,7 @@ func TestProductAddSuccessfully(t *testing.T) {
 func TestProductAddNameError(t *testing.T) {
 	ProductName := gofakeit.Name()
 	repo := memory.NewProductRepository()
-	err := repo.Add(&entity.Product{Name: ProductName})
+	err := repo.Add(ProductName, 0)
 	if err == nil {
 		t.Errorf("Test Product Add Return nil")
 	}
@@ -31,9 +30,24 @@ func TestProductAddNameError(t *testing.T) {
 func TestProductAddWeightError(t *testing.T) {
 	ProductWeight := gofakeit.Number(1, 10)
 	repo := memory.NewProductRepository()
-	err := repo.Add(&entity.Product{Weight: ProductWeight})
+	err := repo.Add("", ProductWeight)
 	if err == nil {
 		t.Errorf("Test Product Add Return nil")
+	}
+}
+
+func TestProductSetDescriptionSuccessfully(t *testing.T) {
+	ProductName := gofakeit.Name()
+	ProductWeight := gofakeit.Number(1, 10)
+	ProductDescription := gofakeit.Extension()
+	repo := memory.NewProductRepository()
+	err := repo.Add(ProductName, ProductWeight)
+	if err != nil {
+		t.Errorf("Test Product RepoAdd SetDescription return Error")
+	}
+	err = repo.SetDescription(ProductName, ProductWeight, ProductDescription)
+	if err != nil {
+		t.Errorf("Test Product SetDescription return Error")
 	}
 }
 
@@ -41,7 +55,7 @@ func TestProductDeleteSuccessfully(t *testing.T) {
 	ProductName := gofakeit.Name()
 	ProductWeight := gofakeit.Number(1, 10)
 	repo := memory.NewProductRepository()
-	err := repo.Add(&entity.Product{Name: ProductName, Weight: ProductWeight})
+	err := repo.Add(ProductName, ProductWeight)
 	if err != nil {
 		t.Errorf("Test Product RepoAdd Delete return Error")
 	}
@@ -64,18 +78,14 @@ func TestProductDeleteError(t *testing.T) {
 func TestProductGetSuccessfully(t *testing.T) {
 	ProductName := gofakeit.Name()
 	ProductWeight := gofakeit.Number(1, 10)
-	product := &entity.Product{Name: ProductName, Weight: ProductWeight}
 	repo := memory.NewProductRepository()
-	err := repo.Add(product)
+	err := repo.Add(ProductName, ProductWeight)
 	if err != nil {
 		t.Errorf("Test Product RepoAdd Get return Error")
 	}
-	testproduct, err := repo.Get(ProductName, ProductWeight)
+	_, err = repo.Get(ProductName, ProductWeight)
 	if err != nil {
 		t.Errorf("Test Product Get return Error")
-	}
-	if testproduct != product {
-		t.Errorf("Test Product Get is not equal product")
 	}
 }
 
@@ -96,9 +106,8 @@ func TestProductGetError(t *testing.T) {
 func TestProductListSuccessfully(t *testing.T) {
 	ProductName := gofakeit.Name()
 	ProductWeight := gofakeit.Number(1, 10)
-	product := &entity.Product{Name: ProductName, Weight: ProductWeight}
 	repo := memory.NewProductRepository()
-	err := repo.Add(product)
+	err := repo.Add(ProductName, ProductWeight)
 	if err != nil {
 		t.Errorf("Test Product RepoAdd List return Error")
 	}

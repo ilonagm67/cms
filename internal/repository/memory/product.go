@@ -15,15 +15,66 @@ func NewProductRepository() *ProductRepository {
 	}
 }
 
-func (repo *ProductRepository) Add(Product *entity.Product) error {
-	if Product.Name == "" || Product.Weight == 0 {
-		return fmt.Errorf("Product Name or Weight Not Found")
+func (repo *ProductRepository) Add(name string, weight int) error {
+	if name == "" || weight == 0 {
+		return fmt.Errorf("Name or Weight not set!")
 	}
-	_, exists := repo.products[Product.Name]
+	_, exists := repo.products[name]
 	if !exists {
-		repo.products[Product.Name] = make(map[int]*entity.Product)
+		repo.products[name] = make(map[int]*entity.Product)
 	}
-	repo.products[Product.Name][Product.Weight] = Product
+	repo.products[name][weight] = &entity.Product{Name: name, Weight: weight}
+	return nil
+}
+
+func (repo *ProductRepository) SetDescription(name string, weight int, description string) error {
+	if name == "" || weight == 0 {
+		return fmt.Errorf("Name or Weight not set!")
+	}
+	if description == "" {
+		return fmt.Errorf("Description not found!")
+	}
+
+	product, exists := repo.products[name][weight]
+	if !exists {
+		return fmt.Errorf("Product %s:%d Not Found!", name, weight)
+	}
+
+	product.Description = description
+	return nil
+}
+
+func (repo *ProductRepository) SetImage(name string, weight int, image string) error {
+	if name == "" || weight == 0 {
+		return fmt.Errorf("Name or Weight not set!")
+	}
+	if image == "" {
+		return fmt.Errorf("Image not set!")
+	}
+
+	product, exists := repo.products[name][weight]
+	if !exists {
+		return fmt.Errorf("Product %s:%d Not Found!", name, weight)
+	}
+
+	product.Image = image
+	return nil
+}
+
+func (repo *ProductRepository) SetPrice(name string, weight int, price int) error {
+	if name == "" || weight == 0 {
+		return fmt.Errorf("Name or Weight not set!")
+	}
+	if price == 0 {
+		return fmt.Errorf("Price not set!")
+	}
+
+	product, exists := repo.products[name][weight]
+	if !exists {
+		return fmt.Errorf("Product %s:%d Not Found!", name, weight)
+	}
+
+	product.Price = price
 	return nil
 }
 
