@@ -22,6 +22,10 @@ func (Service *FSMService) OrderStart(id int64) error {
 }
 
 func (Service *FSMService) ProcessOrderProducts(id int64, text string) error {
+	if text == "🔙Назад" {
+		Service.FSMRepo.Set(id, "order_pre_delivery")
+		return nil
+	}
 	list, err := Service.ProductRepo.List()
 	if err != nil {
 		Service.FSMRepo.Delete(id)
