@@ -64,6 +64,12 @@ func (handler *OrderHandler) HandleOrderProducts(ctx *th.Context, update telego.
 				SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
 				return err
 			}
+			products, err := handler.OrderService.String(update.Message.Chat.ID)
+			if err != nil {
+				SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+				return err
+			}
+			SendMessage(ctx, update.Message.Chat.ID, products, nil)
 			SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию:", PreDeliveryKeyboard)
 			return nil
 		} else {
