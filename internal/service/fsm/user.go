@@ -1,4 +1,4 @@
-package service
+package fsm
 
 func (Service *FSMService) UserQuestionStart(id int64) error {
 	Service.FSMRepo.Set(id, "user_question")

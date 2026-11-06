@@ -2,6 +2,7 @@ package telegohandlers
 
 import (
 	"cms/internal/service"
+	"cms/internal/service/fsm"
 	"errors"
 	"fmt"
 	"strconv"
@@ -12,12 +13,12 @@ import (
 )
 
 type OrderHandler struct {
-	FSMService     *service.FSMService
+	FSMService     *fsm.FSMService
 	OrderService   *service.OrderService
 	ProductService *service.ProductService
 }
 
-func NewOrderHandler(FSMService *service.FSMService, ProductService *service.ProductService, OrderService *service.OrderService) *OrderHandler {
+func NewOrderHandler(FSMService *fsm.FSMService, ProductService *service.ProductService, OrderService *service.OrderService) *OrderHandler {
 	return &OrderHandler{FSMService: FSMService, ProductService: ProductService, OrderService: OrderService}
 }
 

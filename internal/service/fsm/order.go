@@ -1,4 +1,4 @@
-package service
+package fsm
 
 import (
 	"cms/internal/entity"
