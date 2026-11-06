@@ -1,10 +1,7 @@
 package telegohandlers
 
 import (
-	"io"
-	"net/http"
 	"os"
-	"path"
 
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
@@ -104,40 +101,4 @@ func SendMessage(ctx *th.Context, ID int64, text string, keyboard telego.ReplyMa
 		))
 		return err
 	}
-}
-
-func DownloadImage(ctx *th.Context, Folder, ID, Unique string) (string, error) {
-	file, err := ctx.Bot().GetFile(ctx, &telego.GetFileParams{
-		FileID: ID,
-	})
-	if err != nil {
-		return "", err
-	}
-
-	URL := ctx.Bot().FileDownloadURL(file.FilePath)
-	resp, err := http.Get(URL)
-	if err != nil {
-		return "", err
-	}
-
-	_, err = os.ReadDir(Folder)
-	if err != nil {
-		err = os.Mkdir(Folder, 0755)
-		if err != nil {
-			return "", err
-		}
-	}
-
-	filepath := path.Join(Folder, Unique+".jpg")
-	out, err := os.Create(filepath)
-	if err != nil {
-		return "", err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return "", err
-	}
-	return filepath, nil
 }
