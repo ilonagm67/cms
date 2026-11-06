@@ -59,9 +59,19 @@ func (handler *OrderHandler) HandleOrderProducts(ctx *th.Context, update telego.
 			return err
 		}
 		if len(order.Products) > 0 {
+			err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
+			if err != nil {
+				SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+				return err
+			}
 			SendMessage(ctx, update.Message.Chat.ID, "Выберите опцию:", PreDeliveryKeyboard)
 			return nil
 		} else {
+			err := handler.FSMService.ProcessOrderProducts(update.Message.Chat.ID, update.Message.Text)
+			if err != nil {
+				SendMessage(ctx, update.Message.Chat.ID, "Произошла ошибка", MainKeyboard)
+				return err
+			}
 			SendMessage(ctx, update.Message.Chat.ID, "Главное меню", MainKeyboard)
 			return nil
 		}
