@@ -11,11 +11,11 @@ go run . -sqlite/-memory
 
 ## Environments
 
-```bash
-TOKEN - Token of bot BotFather 
-ADMIN - Admin ID for controlling bot
+```
+TOKEN - Token of bot in @BotFather 
+ADMIN - User ID for controlling bot
 ```
 
-## 📄 Лицензия
+## 📄 License
 
 MIT © vangdevops
